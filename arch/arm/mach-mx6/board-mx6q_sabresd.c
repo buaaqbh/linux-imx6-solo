@@ -221,9 +221,9 @@ static int max17135_regulator_init(struct max17135 *max17135);
 
 static const struct esdhc_platform_data mx6q_sabresd_sd2_data __initconst = {
 	.cd_gpio = SABRESD_SD2_CD,
-	.wp_gpio = SABRESD_SD2_WP,
+//	.wp_gpio = SABRESD_SD2_WP,
 	.keep_power_at_suspend = 1,
-	.support_8bit = 1,
+	.support_8bit = 0,
 	.delay_line = 0,
 	.cd_type = ESDHC_CD_CONTROLLER,
 };
@@ -252,8 +252,9 @@ static const struct anatop_thermal_platform_data
 
 static inline void mx6q_sabresd_init_uart(void)
 {
-	imx6q_add_imx_uart(2, NULL);
 	imx6q_add_imx_uart(0, NULL);
+	imx6q_add_imx_uart(1, NULL);
+	imx6q_add_imx_uart(2, NULL);
 }
 
 static int mx6q_sabresd_fec_phy_init(struct phy_device *phydev)
@@ -1229,12 +1230,17 @@ static struct ahci_platform_data mx6q_sabresd_sata_data = {
 };
 #endif
 
+static struct gpio mx6q_sabresd_flexcan_gpios[] = {
+        { SABRESD_CAN1_STBY, GPIOF_OUT_INIT_LOW, "flexcan1-stby" },
+};
+
 static void mx6q_sabresd_flexcan0_switch(int enable)
 {
+	printk("----- Enter func: %s, enable = %d ----------\n", __func__, enable);
 	if (enable) {
-		gpio_set_value(SABRESD_CAN1_STBY, 1);
-	} else {
 		gpio_set_value(SABRESD_CAN1_STBY, 0);
+	} else {
+		gpio_set_value(SABRESD_CAN1_STBY, 1);
 	}
 }
 
@@ -1869,14 +1875,13 @@ static void __init mx6_sabresd_board_init(void)
 			imx6dl_add_imx_epdc(&epdc_data);
 		}
 	}
-	/*
+
 	ret = gpio_request_array(mx6q_sabresd_flexcan_gpios,
 			ARRAY_SIZE(mx6q_sabresd_flexcan_gpios));
 	if (ret)
 		pr_err("failed to request flexcan1-gpios: %d\n", ret);
 	else
 		imx6q_add_flexcan0(&mx6q_sabresd_flexcan0_pdata);
-	*/
 
 	clko2 = clk_get(NULL, "clko2_clk");
 	if (IS_ERR(clko2))
