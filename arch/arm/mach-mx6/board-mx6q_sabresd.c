@@ -207,6 +207,10 @@
 #define SABRESD_WIFI_INT	IMX_GPIO_NR(7, 4)
 #define SABRESD_WIFI_WAKEUP	IMX_GPIO_NR(7, 5)
 
+#define SABRESD_TVP5150_FID	IMX_GPIO_NR(5, 2)
+#define SABRESD_TVP5150_AVID	IMX_GPIO_NR(2, 5)
+#define SABRESD_TVP5150_INTR	IMX_GPIO_NR(2, 4)
+
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 #define MX6_ENET_IRQ		IMX_GPIO_NR(1, 6)
 #define IOMUX_OBSRV_MUX1_OFFSET	0x3c
@@ -523,6 +527,14 @@ static void mx6q_csi0_io_init(void)
 		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_csi0_sensor_pads,
 			ARRAY_SIZE(mx6dl_sabresd_csi0_sensor_pads));
 
+	/* tvp5150 gpio init */
+	gpio_request(SABRESD_TVP5150_FID, "tvp5150-fid");
+	gpio_direction_input(SABRESD_TVP5150_FID);
+	gpio_request(SABRESD_TVP5150_AVID, "tvp5150-avid");
+	gpio_direction_input(SABRESD_TVP5150_AVID);
+	gpio_request(SABRESD_TVP5150_INTR, "tvp5150-intr");
+	gpio_direction_input(SABRESD_TVP5150_INTR);
+
 	/* Camera reset */
 //	gpio_request(SABRESD_CSI0_RST, "cam-reset");
 //	gpio_direction_output(SABRESD_CSI0_RST, 1);
@@ -569,6 +581,17 @@ static struct fsl_mxc_camera_platform_data camera_data = {
 	.csi = 0,
 	.io_init = mx6q_csi0_io_init,
 	.pwdn = mx6q_csi0_cam_powerdown,
+};
+
+static struct fsl_mxc_tvin_platform_data tvp5150_data = {
+        .dvddio_reg     = NULL,
+        .dvdd_reg       = NULL,
+        .avdd_reg       = NULL,
+        .pvdd_reg       = NULL,
+        .pwdn           = NULL,
+        .reset          = NULL,
+        .cvbs           = true,
+        .io_init        = mx6q_csi0_io_init,
 };
 
 static void mx6q_mipi_powerdown(int powerdown)
@@ -819,6 +842,10 @@ static struct i2c_board_info mxc_i2c0_board_info[] __initdata = {
 		I2C_BOARD_INFO("mma8451", 0x1c),
 		.platform_data = (void *)&mma8451_position,
 	},
+	{
+                I2C_BOARD_INFO("tvp5150", 0x5d),
+                .platform_data = (void *)&tvp5150_data,
+        }, 
 };
 
 static struct i2c_board_info mxc_i2c1_board_info[] __initdata = {
