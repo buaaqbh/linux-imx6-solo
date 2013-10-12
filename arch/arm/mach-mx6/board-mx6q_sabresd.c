@@ -56,6 +56,7 @@
 #include <linux/mfd/wm8994/gpio.h>
 #include <sound/wm8962.h>
 #include <linux/mfd/mxc-hdmi-core.h>
+#include <linux/smsc911x.h>
 
 #include <mach/common.h>
 #include <mach/hardware.h>
@@ -88,11 +89,11 @@
 #define SABRESD_VOLUME_UP	IMX_GPIO_NR(1, 4)
 #define SABRESD_VOLUME_DN	IMX_GPIO_NR(1, 5)
 #define SABRESD_MICROPHONE_DET	IMX_GPIO_NR(1, 9)
-#define SABRESD_CSI0_PWN	IMX_GPIO_NR(1, 16)
-#define SABRESD_CSI0_RST	IMX_GPIO_NR(1, 17)
-#define SABRESD_ACCL_INT	IMX_GPIO_NR(1, 18)
-#define SABRESD_MIPICSI_PWN	IMX_GPIO_NR(1, 19)
-#define SABRESD_MIPICSI_RST	IMX_GPIO_NR(1, 20)
+//#define SABRESD_CSI0_PWN	IMX_GPIO_NR(1, 16)
+//#define SABRESD_CSI0_RST	IMX_GPIO_NR(1, 17)
+//#define SABRESD_ACCL_INT	IMX_GPIO_NR(1, 18)
+//#define SABRESD_MIPICSI_PWN	IMX_GPIO_NR(1, 19)
+//#define SABRESD_MIPICSI_RST	IMX_GPIO_NR(1, 20)
 #define SABRESD_RGMII_RST	IMX_GPIO_NR(1, 25)
 #define SABRESD_RGMII_INT	IMX_GPIO_NR(1, 26)
 #define SABRESD_CHARGE_UOK_B	IMX_GPIO_NR(1, 27)
@@ -131,7 +132,7 @@
 
 #define SABRESD_DI0_D0_CS	IMX_GPIO_NR(5, 0)
 #define SABRESD_CHARGE_FLT_1_B	IMX_GPIO_NR(5, 2)
-#define SABRESD_PCIE_WAKE_B	IMX_GPIO_NR(5, 20)
+#define SABRESD_PCIE_WAKE_B	IMX_GPIO_NR(5, 25)
 
 #define SABRESD_CAP_TCH_INT1	IMX_GPIO_NR(6, 7)
 #define SABRESD_CAP_TCH_INT0	IMX_GPIO_NR(6, 8)
@@ -198,6 +199,14 @@
 #define SABRESD_ELAN_RST	IMX_GPIO_NR(3, 8)
 #define SABRESD_ELAN_INT	IMX_GPIO_NR(3, 28)
 
+#define SABRESD_SMSC911X_RESET	IMX_GPIO_NR(3, 15)
+#define SABRESD_SMSC911X_INT	IMX_GPIO_NR(2, 25)
+#define SABRESD_SMSC911X_FIFO	IMX_GPIO_NR(2, 27)
+#define SABRESD_SMSC911X_PME	IMX_GPIO_NR(3, 14)
+#define SABRESD_WIFI_PWR_EN	IMX_GPIO_NR(7, 6)
+#define SABRESD_WIFI_INT	IMX_GPIO_NR(7, 4)
+#define SABRESD_WIFI_WAKEUP	IMX_GPIO_NR(7, 5)
+
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 #define MX6_ENET_IRQ		IMX_GPIO_NR(1, 6)
 #define IOMUX_OBSRV_MUX1_OFFSET	0x3c
@@ -228,13 +237,12 @@ static const struct esdhc_platform_data mx6q_sabresd_sd2_data __initconst = {
 	.cd_type = ESDHC_CD_CONTROLLER,
 };
 
-static const struct esdhc_platform_data mx6q_sabresd_sd3_data __initconst = {
-	.cd_gpio = SABRESD_SD3_CD,
-	.wp_gpio = SABRESD_SD3_WP,
+static const struct esdhc_platform_data mx6q_sabresd_sd1_data __initconst = {
+	.always_present = 1,
 	.keep_power_at_suspend = 1,
-	.support_8bit = 1,
+	.support_8bit = 0,
 	.delay_line = 0,
-	.cd_type = ESDHC_CD_CONTROLLER,
+	.cd_type = ESDHC_CD_PERMANENT,
 };
 
 static const struct esdhc_platform_data mx6q_sabresd_sd4_data __initconst = {
@@ -496,16 +504,18 @@ static struct platform_device sabresd_vwm8962_reg_devices = {
 
 static void mx6q_csi0_cam_powerdown(int powerdown)
 {
-	if (powerdown)
-		gpio_set_value(SABRESD_CSI0_PWN, 1);
-	else
-		gpio_set_value(SABRESD_CSI0_PWN, 0);
+//	if (powerdown)
+//		gpio_set_value(SABRESD_CSI0_PWN, 1);
+//	else
+//		gpio_set_value(SABRESD_CSI0_PWN, 0);
 
 	msleep(2);
 }
 
 static void mx6q_csi0_io_init(void)
 {
+	printk("Kernel: Enter func %s \n", __func__);
+
 	if (cpu_is_mx6q())
 		mxc_iomux_v3_setup_multiple_pads(mx6q_sabresd_csi0_sensor_pads,
 			ARRAY_SIZE(mx6q_sabresd_csi0_sensor_pads));
@@ -514,20 +524,20 @@ static void mx6q_csi0_io_init(void)
 			ARRAY_SIZE(mx6dl_sabresd_csi0_sensor_pads));
 
 	/* Camera reset */
-	gpio_request(SABRESD_CSI0_RST, "cam-reset");
-	gpio_direction_output(SABRESD_CSI0_RST, 1);
+//	gpio_request(SABRESD_CSI0_RST, "cam-reset");
+//	gpio_direction_output(SABRESD_CSI0_RST, 1);
 
 	/* Camera power down */
-	gpio_request(SABRESD_CSI0_PWN, "cam-pwdn");
-	gpio_direction_output(SABRESD_CSI0_PWN, 1);
-	msleep(5);
-	gpio_set_value(SABRESD_CSI0_PWN, 0);
-	msleep(5);
-	gpio_set_value(SABRESD_CSI0_RST, 0);
-	msleep(1);
-	gpio_set_value(SABRESD_CSI0_RST, 1);
-	msleep(5);
-	gpio_set_value(SABRESD_CSI0_PWN, 1);
+//	gpio_request(SABRESD_CSI0_PWN, "cam-pwdn");
+//	gpio_direction_output(SABRESD_CSI0_PWN, 1);
+//	msleep(5);
+//	gpio_set_value(SABRESD_CSI0_PWN, 0);
+//	msleep(5);
+//	gpio_set_value(SABRESD_CSI0_RST, 0);
+//	msleep(1);
+//	gpio_set_value(SABRESD_CSI0_RST, 1);
+//	msleep(5);
+//	gpio_set_value(SABRESD_CSI0_PWN, 1);
 
 	/* For MX6Q:
 	 * GPR1 bit19 and bit20 meaning:
@@ -563,10 +573,10 @@ static struct fsl_mxc_camera_platform_data camera_data = {
 
 static void mx6q_mipi_powerdown(int powerdown)
 {
-	if (powerdown)
-		gpio_set_value(SABRESD_MIPICSI_PWN, 1);
-	else
-		gpio_set_value(SABRESD_MIPICSI_PWN, 0);
+//	if (powerdown)
+//		gpio_set_value(SABRESD_MIPICSI_PWN, 1);
+//	else
+//		gpio_set_value(SABRESD_MIPICSI_PWN, 0);
 
 	msleep(2);
 }
@@ -581,20 +591,20 @@ static void mx6q_mipi_sensor_io_init(void)
 			ARRAY_SIZE(mx6dl_sabresd_mipi_sensor_pads));
 
 	/* Camera reset */
-	gpio_request(SABRESD_MIPICSI_RST, "cam-reset");
-	gpio_direction_output(SABRESD_MIPICSI_RST, 1);
+//	gpio_request(SABRESD_MIPICSI_RST, "cam-reset");
+//	gpio_direction_output(SABRESD_MIPICSI_RST, 1);
 
 	/* Camera power down */
-	gpio_request(SABRESD_MIPICSI_PWN, "cam-pwdn");
-	gpio_direction_output(SABRESD_MIPICSI_PWN, 1);
-	msleep(5);
-	gpio_set_value(SABRESD_MIPICSI_PWN, 0);
-	msleep(5);
-	gpio_set_value(SABRESD_MIPICSI_RST, 0);
-	msleep(1);
-	gpio_set_value(SABRESD_MIPICSI_RST, 1);
-	msleep(5);
-	gpio_set_value(SABRESD_MIPICSI_PWN, 1);
+//	gpio_request(SABRESD_MIPICSI_PWN, "cam-pwdn");
+//	gpio_direction_output(SABRESD_MIPICSI_PWN, 1);
+//	msleep(5);
+//	gpio_set_value(SABRESD_MIPICSI_PWN, 0);
+//	msleep(5);
+//	gpio_set_value(SABRESD_MIPICSI_RST, 0);
+//	msleep(1);
+//	gpio_set_value(SABRESD_MIPICSI_RST, 1);
+//	msleep(5);
+//	gpio_set_value(SABRESD_MIPICSI_PWN, 1);
 
 	/*for mx6dl, mipi virtual channel 1 connect to csi 1*/
 	if (cpu_is_mx6dl())
@@ -1515,11 +1525,26 @@ static void pcie_3v3_reset(void)
 	gpio_direction_output(SABRESD_PCIE_RST_B_REVB, 0);
 	/* The PCI Express Mini CEM specification states that PREST# is
 	deasserted minimum 1ms after 3.3vVaux has been applied and stable*/
-	mdelay(1);
+	mdelay(100);
 	gpio_set_value(SABRESD_PCIE_RST_B_REVB, 1);
 	gpio_free(SABRESD_PCIE_RST_B_REVB);
 }
 #endif
+
+static void pcie_gpio_init(void)
+{
+	gpio_request(SABRESD_PCIE_WAKE_B, "pcie_wake_rebB");
+	gpio_direction_output(SABRESD_PCIE_WAKE_B, 1);
+
+	/* reset miniPCIe */
+	gpio_request(SABRESD_PCIE_RST_B_REVB, "pcie_reset_rebB");
+	gpio_direction_output(SABRESD_PCIE_RST_B_REVB, 0);
+	/* The PCI Express Mini CEM specification states that PREST# is
+	deasserted minimum 1ms after 3.3vVaux has been applied and stable*/
+	mdelay(100);
+	gpio_set_value(SABRESD_PCIE_RST_B_REVB, 1);
+	gpio_free(SABRESD_PCIE_RST_B_REVB);
+}
 
 static void gps_power_on(bool on)
 {
@@ -1695,6 +1720,94 @@ static const struct imx_pcie_platform_data mx6_sabresd_pcie_data __initconst = {
 	.pcie_dis	= SABRESD_PCIE_DIS_B,
 };
 
+/* These registers settings are just valid for Numonyx M29W256GL7AN6E. */
+static void mx6q_setup_weimcs(void)
+{
+	void __iomem *nor_reg = MX6_IO_ADDRESS(WEIM_BASE_ADDR);
+	void __iomem *ccm_reg = MX6_IO_ADDRESS(CCM_BASE_ADDR);
+	void __iomem *iomuxc_base = MX6_IO_ADDRESS(MX6Q_IOMUXC_BASE_ADDR);
+	unsigned int reg;
+	struct clk *clk;
+	u32 rate;
+
+	/* CLKCTL_CCGR6: Set emi_slow_clock to be on in all modes */
+	reg = readl(ccm_reg + 0x80);
+	reg |= 0x00000C00;
+	writel(reg, ccm_reg + 0x80);
+
+	/* Timing settings below based upon datasheet for M29W256GL7AN6E
+	   These setting assume that the EIM_SLOW_CLOCK is set to 132 MHz */
+	clk = clk_get(NULL, "emi_slow_clk");
+	if (IS_ERR(clk))
+		printk(KERN_ERR "emi_slow_clk not found\n");
+
+	rate = clk_get_rate(clk);
+	if (rate != 132000000)
+		printk(KERN_ERR "Warning: emi_slow_clk not set to 132 MHz!"
+		       " WEIM NOR timing may be incorrect!\n");
+#if 1
+	writel(0x00020001, nor_reg);
+	writel(0x00000000, nor_reg + 0x00000004);
+	writel(0x16000202, nor_reg + 0x00000008);
+	writel(0x00000002, nor_reg + 0x0000000C);
+	writel(0x16002082, nor_reg + 0x00000010);
+	writel(0x00000000, nor_reg + 0x00000014);
+	writel(0x00000000, nor_reg + 0x00000090);
+#else
+	writel(0x00620081, nor_reg);
+	writel(0x00000001, nor_reg + 0x00000004);
+	writel(0x1C022000, nor_reg + 0x00000008);
+	writel(0x0000C000, nor_reg + 0x0000000C);
+	writel(0x1404a38e, nor_reg + 0x00000010);
+	writel(0x00000000, nor_reg + 0x00000014);
+#endif
+
+	reg = readl(iomuxc_base + 0x4);
+	printk("--------------- reg: 0x%08x -----------\n", reg);
+}
+
+static struct resource mx6q_smsc911x_resources[] = {
+        {
+         .start = CS0_BASE_ADDR,
+         .end = CS0_BASE_ADDR + SZ_4K - 1,
+         .flags = IORESOURCE_MEM,
+        },
+        {
+         .start =  gpio_to_irq(SABRESD_SMSC911X_INT),
+         .end =  gpio_to_irq(SABRESD_SMSC911X_INT),
+         .flags = IORESOURCE_IRQ,
+        },
+};
+
+struct smsc911x_platform_config mx6q_smsc911x_config = {
+        .irq_polarity = SMSC911X_IRQ_POLARITY_ACTIVE_LOW,
+        .irq_type = SMSC911X_IRQ_TYPE_PUSH_PULL,
+        .flags = SMSC911X_USE_16BIT,
+};
+
+static struct platform_device mx6q_smsc_lan9220_device = {
+        .name = "smsc911x",
+        .id = 0,
+        .num_resources = ARRAY_SIZE(mx6q_smsc911x_resources),
+        .resource = mx6q_smsc911x_resources,
+};
+
+static void imx6q_add_smsc911x(void)
+{
+	gpio_request(SABRESD_SMSC911X_INT, "smsc-irq");
+	gpio_direction_input(SABRESD_SMSC911X_INT);
+	gpio_request(SABRESD_SMSC911X_PME, "smsc-pme");
+	gpio_direction_input(SABRESD_SMSC911X_PME);
+	gpio_request(SABRESD_SMSC911X_FIFO, "smsc-fifo");
+	gpio_direction_output(SABRESD_SMSC911X_FIFO, 0);
+	gpio_request(SABRESD_SMSC911X_RESET, "smsc-reset");
+	gpio_direction_output(SABRESD_SMSC911X_RESET, 0);
+	mdelay(200);
+	gpio_set_value(SABRESD_SMSC911X_RESET, 1);
+	mx6q_setup_weimcs();
+	mxc_register_device(&mx6q_smsc_lan9220_device, &mx6q_smsc911x_config);
+}
+
 /*!
  * Board specific initialization.
  */
@@ -1809,7 +1922,18 @@ static void __init mx6_sabresd_board_init(void)
 	*/
 	imx6q_add_sdhci_usdhc_imx(3, &mx6q_sabresd_sd4_data);
 	imx6q_add_sdhci_usdhc_imx(1, &mx6q_sabresd_sd2_data);
-	imx6q_add_sdhci_usdhc_imx(2, &mx6q_sabresd_sd3_data);
+	
+	gpio_request(SABRESD_WIFI_PWR_EN, "wifi-pwr");
+	gpio_direction_output(SABRESD_WIFI_PWR_EN, 0);
+	gpio_request(SABRESD_WIFI_INT, "wifi-int");
+	gpio_direction_input(SABRESD_WIFI_INT);
+	gpio_request(SABRESD_WIFI_WAKEUP, "wifi-wakeup");
+	gpio_direction_output(SABRESD_WIFI_WAKEUP, 0);
+	mdelay(500);
+	gpio_set_value(SABRESD_WIFI_WAKEUP, 1);
+
+	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
+
 	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
 	imx6q_sabresd_init_usb();
 	/* SATA is not supported by MX6DL/Solo */
@@ -1912,6 +2036,10 @@ static void __init mx6_sabresd_board_init(void)
 	mdelay(10);
 	pcie_3v3_reset();
 #endif
+
+	pcie_gpio_init();
+
+	imx6q_add_smsc911x();
 
 	gps_power_on(true);
 	/* Register charger chips */

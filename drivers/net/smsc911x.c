@@ -1956,6 +1956,16 @@ static int __devinit smsc911x_init(struct net_device *dev)
 		byte_test = smsc911x_reg_read(pdata, BYTE_TEST);
 	}
 
+/*
+	while(1) {
+		smsc911x_reg_read(pdata, BYTE_TEST);
+//		mdelay(10);
+//		__smsc911x_reg_write(pdata, 0, 0x5a5a5a5a);
+//		__smsc911x_reg_write(pdata, 0, 0xa5a5a5a5);
+//		mdelay(10);
+	}
+*/
+
 	if (byte_test != 0x87654321) {
 		SMSC_WARN(pdata, drv, "BYTE_TEST: 0x%08X", byte_test);
 		if (((byte_test >> 16) & 0xFFFF) == (byte_test & 0xFFFF)) {
