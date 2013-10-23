@@ -211,6 +211,9 @@
 #define SABRESD_TVP5150_AVID	IMX_GPIO_NR(2, 5)
 #define SABRESD_TVP5150_INTR	IMX_GPIO_NR(2, 4)
 
+#define SABRESD_RS485_DE	IMX_GPIO_NR(4, 14)
+#define SABRESD_RS485_RE	IMX_GPIO_NR(4, 15)
+
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 #define MX6_ENET_IRQ		IMX_GPIO_NR(1, 6)
 #define IOMUX_OBSRV_MUX1_OFFSET	0x3c
@@ -264,9 +267,14 @@ static const struct anatop_thermal_platform_data
 
 static inline void mx6q_sabresd_init_uart(void)
 {
+	gpio_request(SABRESD_RS485_DE, "rs485-de");
+	gpio_direction_output(SABRESD_RS485_DE, 1);
+	gpio_request(SABRESD_RS485_RE, "rs485-re");
+	gpio_direction_output(SABRESD_RS485_RE, 0);
+
 	imx6q_add_imx_uart(0, NULL);
 	imx6q_add_imx_uart(1, NULL);
-	imx6q_add_imx_uart(2, NULL);
+	imx6q_add_imx_uart(4, NULL);
 }
 
 static int mx6q_sabresd_fec_phy_init(struct phy_device *phydev)
@@ -1959,7 +1967,7 @@ static void __init mx6_sabresd_board_init(void)
 	mdelay(500);
 	gpio_set_value(SABRESD_WIFI_WAKEUP, 1);
 
-	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
+//	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
 
 	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
 	imx6q_sabresd_init_usb();
