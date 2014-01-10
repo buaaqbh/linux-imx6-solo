@@ -57,6 +57,7 @@
 #include <sound/wm8962.h>
 #include <linux/mfd/mxc-hdmi-core.h>
 #include <linux/smsc911x.h>
+#include <linux/power/gpio-power.h>
 
 #include <mach/common.h>
 #include <mach/hardware.h>
@@ -87,7 +88,7 @@
 #define SABRESD_USR_DEF_GRN_LED	IMX_GPIO_NR(1, 1)
 #define SABRESD_USR_DEF_RED_LED	IMX_GPIO_NR(1, 2)
 #define SABRESD_VOLUME_UP	IMX_GPIO_NR(1, 4)
-#define SABRESD_VOLUME_DN	IMX_GPIO_NR(1, 5)
+#define SABRESD_VOLUME_DN	IMX_GPIO_NR(1, 3)
 #define SABRESD_MICROPHONE_DET	IMX_GPIO_NR(1, 9)
 //#define SABRESD_CSI0_PWN	IMX_GPIO_NR(1, 16)
 //#define SABRESD_CSI0_RST	IMX_GPIO_NR(1, 17)
@@ -124,11 +125,11 @@
 #define SABRESD_DISP0_RD	IMX_GPIO_NR(3, 28)
 #define SABRESD_POWER_OFF	IMX_GPIO_NR(3, 29)
 
-#define SABRESD_CAN1_STBY	IMX_GPIO_NR(4, 5)
+#define SABRESD_CAN1_STBY	IMX_GPIO_NR(1, 9)
 #define SABRESD_ECSPI1_CS0  IMX_GPIO_NR(4, 9)
-#define SABRESD_CODEC_PWR_EN	IMX_GPIO_NR(4, 10)
+#define SABRESD_CODEC_PWR_EN	IMX_GPIO_NR(3, 16)
 #define SABRESD_HDMI_CEC_IN	IMX_GPIO_NR(4, 11)
-#define SABRESD_PCIE_DIS_B	IMX_GPIO_NR(4, 14)
+#define SABRESD_PCIE_DIS_B	IMX_GPIO_NR(5, 22)
 
 #define SABRESD_DI0_D0_CS	IMX_GPIO_NR(5, 0)
 #define SABRESD_CHARGE_FLT_1_B	IMX_GPIO_NR(5, 2)
@@ -140,8 +141,8 @@
 #define SABRESD_DISP_PWR_EN	IMX_GPIO_NR(6, 14)
 #define SABRESD_CABC_EN0	IMX_GPIO_NR(6, 15)
 #define SABRESD_CABC_EN1	IMX_GPIO_NR(6, 16)
-#define SABRESD_AUX_3V15_EN	IMX_GPIO_NR(6, 9)
-#define SABRESD_DISP0_WR_REVB	IMX_GPIO_NR(6, 9)
+#define SABRESD_AUX_3V15_EN	IMX_GPIO_NR(6, 7)
+#define SABRESD_DISP0_WR_REVB	IMX_GPIO_NR(6, 7)
 #define SABRESD_AUX_5V_EN	IMX_GPIO_NR(6, 10)
 #define SABRESD_DI1_D0_CS	IMX_GPIO_NR(6, 31)
 
@@ -203,19 +204,35 @@
 #define SABRESD_SMSC911X_INT	IMX_GPIO_NR(2, 25)
 #define SABRESD_SMSC911X_FIFO	IMX_GPIO_NR(2, 27)
 #define SABRESD_SMSC911X_PME	IMX_GPIO_NR(3, 14)
-#define SABRESD_WIFI_PWR_EN	IMX_GPIO_NR(7, 6)
-#define SABRESD_WIFI_INT	IMX_GPIO_NR(7, 4)
-#define SABRESD_WIFI_WAKEUP	IMX_GPIO_NR(7, 5)
+#define SABRESD_WIFI_PWR_EN	IMX_GPIO_NR(6, 9)
+#define SABRESD_WIFI_INT	IMX_GPIO_NR(2, 3)
+#define SABRESD_WIFI_WAKEUP	IMX_GPIO_NR(3, 19)
 
-#define SABRESD_TVP5150_FID	IMX_GPIO_NR(5, 2)
+#define SABRESD_TVP5150_PWR_EN	IMX_GPIO_NR(1, 2)
+#define SABRESD_TVP5150_RST	IMX_GPIO_NR(7, 7)
+#define SABRESD_TVP5150_PDN	IMX_GPIO_NR(6, 8)
+#define SABRESD_TVP5150_FID	IMX_GPIO_NR(7, 6)
 #define SABRESD_TVP5150_AVID	IMX_GPIO_NR(2, 5)
 #define SABRESD_TVP5150_INTR	IMX_GPIO_NR(2, 4)
 
 #define SABRESD_RS485_DE	IMX_GPIO_NR(4, 14)
 #define SABRESD_RS485_RE	IMX_GPIO_NR(4, 15)
 
+#define SABRESD_SD0_CLK		IMX_GPIO_NR(1, 20)
+#define SABRESD_SD0_D0		IMX_GPIO_NR(1, 16)
+#define SABRESD_SD0_CMD		IMX_GPIO_NR(1, 18)
+#define SABRESD_SD0_D1		IMX_GPIO_NR(1, 17)
+#define SABRESD_SD0_D2		IMX_GPIO_NR(1, 19)
+#define SABRESD_SD0_D3		IMX_GPIO_NR(1, 21)
+
+#define SABRESD_12V_EN		IMX_GPIO_NR(1, 0)
+#define SABRESD_ZIGBEE_PWR_EN	IMX_GPIO_NR(3, 23)
+#define SABRESD_ZIGBEE_RESET	IMX_GPIO_NR(3, 22)
+#define SABRESD_CAN_PWR_EN	IMX_GPIO_NR(1, 6)
+#define SABRESD_RS485_PWR_EN	IMX_GPIO_NR(1, 5)
+
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
-#define MX6_ENET_IRQ		IMX_GPIO_NR(1, 6)
+#define MX6_ENET_IRQ		IMX_GPIO_NR(1, 4)
 #define IOMUX_OBSRV_MUX1_OFFSET	0x3c
 #define OBSRV_MUX1_MASK			0x3f
 #define OBSRV_MUX1_ENET_IRQ		0x9
@@ -246,9 +263,11 @@ static const struct esdhc_platform_data mx6q_sabresd_sd2_data __initconst = {
 
 static const struct esdhc_platform_data mx6q_sabresd_sd1_data __initconst = {
 	.always_present = 1,
+//	.cd_gpio = SABRESD_WIFI_WAKEUP,
 	.keep_power_at_suspend = 1,
 	.support_8bit = 0,
 	.delay_line = 0,
+//	.cd_type = ESDHC_CD_CONTROLLER,
 	.cd_type = ESDHC_CD_PERMANENT,
 };
 
@@ -542,22 +561,25 @@ static void mx6q_csi0_io_init(void)
 	gpio_direction_input(SABRESD_TVP5150_AVID);
 	gpio_request(SABRESD_TVP5150_INTR, "tvp5150-intr");
 	gpio_direction_input(SABRESD_TVP5150_INTR);
-
-	/* Camera reset */
-//	gpio_request(SABRESD_CSI0_RST, "cam-reset");
-//	gpio_direction_output(SABRESD_CSI0_RST, 1);
+	gpio_request(SABRESD_TVP5150_PDN, "tvp5150-pdn");
+	gpio_direction_output(SABRESD_TVP5150_PDN, 1);
 
 	/* Camera power down */
-//	gpio_request(SABRESD_CSI0_PWN, "cam-pwdn");
-//	gpio_direction_output(SABRESD_CSI0_PWN, 1);
-//	msleep(5);
-//	gpio_set_value(SABRESD_CSI0_PWN, 0);
-//	msleep(5);
-//	gpio_set_value(SABRESD_CSI0_RST, 0);
-//	msleep(1);
-//	gpio_set_value(SABRESD_CSI0_RST, 1);
-//	msleep(5);
-//	gpio_set_value(SABRESD_CSI0_PWN, 1);
+	gpio_request(SABRESD_TVP5150_PWR_EN, "tvp5150-pwr-en");
+	gpio_direction_output(SABRESD_TVP5150_PWR_EN, 0);
+
+	/* Camera reset */
+	gpio_request(SABRESD_TVP5150_RST, "tvp5150-reset");
+	gpio_direction_output(SABRESD_TVP5150_RST, 1);
+
+	msleep(5);
+	gpio_set_value(SABRESD_TVP5150_PWR_EN, 1);
+	msleep(5);
+	gpio_set_value(SABRESD_TVP5150_RST, 0);
+	msleep(1);
+	gpio_set_value(SABRESD_TVP5150_RST, 1);
+	msleep(5);
+	gpio_set_value(SABRESD_TVP5150_PWR_EN, 0);
 
 	/* For MX6Q:
 	 * GPR1 bit19 and bit20 meaning:
@@ -851,7 +873,7 @@ static struct i2c_board_info mxc_i2c0_board_info[] __initdata = {
 		.platform_data = (void *)&mma8451_position,
 	},
 	{
-                I2C_BOARD_INFO("tvp5150", 0x5d),
+                I2C_BOARD_INFO("tvp5150", 0x5c),
                 .platform_data = (void *)&tvp5150_data,
         }, 
 };
@@ -1281,7 +1303,7 @@ static struct gpio mx6q_sabresd_flexcan_gpios[] = {
 
 static void mx6q_sabresd_flexcan0_switch(int enable)
 {
-	printk("----- Enter func: %s, enable = %d ----------\n", __func__, enable);
+//	printk("----- Enter func: %s, enable = %d ----------\n", __func__, enable);
 	if (enable) {
 		gpio_set_value(SABRESD_CAN1_STBY, 0);
 	} else {
@@ -1496,7 +1518,7 @@ static const struct pm_platform_data mx6q_sabresd_pm_data __initconst = {
 };
 
 static struct regulator_consumer_supply sabresd_vmmc_consumers[] = {
-	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.1"),
+//	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.1"),
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.2"),
 	REGULATOR_SUPPLY("vmmc", "sdhci-esdhc-imx.3"),
 };
@@ -1568,8 +1590,12 @@ static void pcie_3v3_reset(void)
 
 static void pcie_gpio_init(void)
 {
+	printk("--------------------- pcie_gpio_init --------------------\n");
 	gpio_request(SABRESD_PCIE_WAKE_B, "pcie_wake_rebB");
-	gpio_direction_output(SABRESD_PCIE_WAKE_B, 1);
+	gpio_direction_output(SABRESD_PCIE_WAKE_B, 0);
+
+	gpio_request(SABRESD_PCIE_DIS_B, "pcie_wake_rebB");
+	gpio_direction_output(SABRESD_PCIE_DIS_B, 1);
 
 	/* reset miniPCIe */
 	gpio_request(SABRESD_PCIE_RST_B_REVB, "pcie_reset_rebB");
@@ -1843,6 +1869,56 @@ static void imx6q_add_smsc911x(void)
 	mxc_register_device(&mx6q_smsc_lan9220_device, &mx6q_smsc911x_config);
 }
 
+struct gpio_power_data sabresd_gpio_power_data = {
+	.gpio_power_12v_en = SABRESD_12V_EN,
+	.gpio_power_zigbee_en = SABRESD_ZIGBEE_PWR_EN,
+	.gpio_power_tvp5150_en = SABRESD_TVP5150_PWR_EN,
+	.gpio_power_can_en = SABRESD_CAN_PWR_EN,
+	.gpio_power_rs485_en = SABRESD_RS485_PWR_EN,
+	.gpio_power_codec_en = -1, //SABRESD_CODEC_PWR_EN,
+	.gpio_power_pcie_en = -1, //SABRESD_PCIE_PWR_EN,
+	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
+};
+
+static struct platform_device mx6q_power_control_device = {
+        .name = "gpio-power",
+        .id = 0,
+};
+
+static void __init imx6q_sabresd_power_control_init(void)
+{
+	gpio_request(SABRESD_12V_EN, "sys12v-en");
+	gpio_direction_output(SABRESD_12V_EN, 0);
+
+	gpio_request(SABRESD_ZIGBEE_PWR_EN, "zigbee-pwr-en");
+	gpio_direction_output(SABRESD_ZIGBEE_PWR_EN, 0);
+
+	gpio_request(SABRESD_ZIGBEE_RESET, "zigbee-reset");
+	gpio_direction_output(SABRESD_ZIGBEE_RESET, 0);
+	mdelay(200);
+	gpio_set_value(SABRESD_ZIGBEE_RESET, 1);
+
+	gpio_request(SABRESD_TVP5150_PWR_EN, "tvp5150-pwr-en");
+	gpio_direction_output(SABRESD_TVP5150_PWR_EN, 0);
+
+	gpio_request(SABRESD_CAN_PWR_EN, "can-pwr-en");
+	gpio_direction_output(SABRESD_CAN_PWR_EN, 1);
+
+	gpio_request(SABRESD_RS485_PWR_EN, "rs485-pwr-en");
+	gpio_direction_output(SABRESD_RS485_PWR_EN, 0);
+
+//	gpio_request(SABRESD_PCIE_PWR_EN, "pci-pwr-en");
+//	gpio_direction_output(SABRESD_PCIE_PWR_EN, 0);
+
+//	gpio_request(SABRESD_CODEC_PWR_EN, "codec-pwr-en");
+//	gpio_direction_output(SABRESD_CODEC_PWR_EN, 0);
+
+	gpio_request(SABRESD_WIFI_PWR_EN, "wifi-pwr-en");
+	gpio_direction_output(SABRESD_WIFI_PWR_EN, 0);
+
+	mxc_register_device(&mx6q_power_control_device, &sabresd_gpio_power_data);
+}
+
 /*!
  * Board specific initialization.
  */
@@ -1861,6 +1937,8 @@ static void __init mx6_sabresd_board_init(void)
 		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_pads,
 			ARRAY_SIZE(mx6dl_sabresd_pads));
 	}
+
+	imx6q_sabresd_power_control_init();
 
 #ifdef CONFIG_FEC_1588
 	/* Set GPIO_16 input for IEEE-1588 ts_clk and RMII reference clock
@@ -1903,8 +1981,8 @@ static void __init mx6_sabresd_board_init(void)
 	imx6q_add_ldb(&ldb_data);
 	imx6q_add_v4l2_output(0);
 	imx6q_add_v4l2_capture(0, &capture_data[0]);
-	imx6q_add_v4l2_capture(1, &capture_data[1]);
-	imx6q_add_mipi_csi2(&mipi_csi2_pdata);
+//	imx6q_add_v4l2_capture(1, &capture_data[1]);
+//	imx6q_add_mipi_csi2(&mipi_csi2_pdata);
 	imx6q_add_imx_snvs_rtc();
 
 	if (1 == caam_enabled)
@@ -1958,16 +2036,49 @@ static void __init mx6_sabresd_board_init(void)
 	imx6q_add_sdhci_usdhc_imx(3, &mx6q_sabresd_sd4_data);
 	imx6q_add_sdhci_usdhc_imx(1, &mx6q_sabresd_sd2_data);
 	
-	gpio_request(SABRESD_WIFI_PWR_EN, "wifi-pwr");
+	gpio_request(SABRESD_WIFI_PWR_EN, "wifi-pwr-en");
 	gpio_direction_output(SABRESD_WIFI_PWR_EN, 0);
 	gpio_request(SABRESD_WIFI_INT, "wifi-int");
-	gpio_direction_input(SABRESD_WIFI_INT);
+//	gpio_direction_input(SABRESD_WIFI_INT);
+	gpio_direction_output(SABRESD_WIFI_INT, 1);
 	gpio_request(SABRESD_WIFI_WAKEUP, "wifi-wakeup");
-	gpio_direction_output(SABRESD_WIFI_WAKEUP, 0);
-	mdelay(500);
-	gpio_set_value(SABRESD_WIFI_WAKEUP, 1);
+	gpio_direction_output(SABRESD_WIFI_WAKEUP, 1);
+//	mdelay(500);
+//	gpio_set_value(SABRESD_WIFI_WAKEUP, 1);
 
-//	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
+/*
+	gpio_request(SABRESD_SD0_CLK, "sd-test");
+	gpio_direction_output(SABRESD_SD0_CLK, 0);
+	gpio_request(SABRESD_SD0_D0, "sd-test2");
+	gpio_direction_output(SABRESD_SD0_D0, 0);
+	gpio_request(SABRESD_SD0_CMD, "sd-test3");
+	gpio_direction_output(SABRESD_SD0_CMD, 0);
+	gpio_request(SABRESD_SD0_D1, "sd-test4");
+	gpio_direction_output(SABRESD_SD0_D1, 0);
+	gpio_request(SABRESD_SD0_D2, "sd-test5");
+	gpio_direction_output(SABRESD_SD0_D2, 0);
+	gpio_request(SABRESD_SD0_D3, "sd-test6");
+	gpio_direction_output(SABRESD_SD0_D3, 0);
+	while (1) {
+	printk("------ SD IO test -------\n");
+	mdelay(10);
+	gpio_set_value(SABRESD_SD0_CLK, 1);
+	gpio_set_value(SABRESD_SD0_CMD, 1);
+	gpio_set_value(SABRESD_SD0_D0, 1);
+	gpio_set_value(SABRESD_SD0_D1, 1);
+	gpio_set_value(SABRESD_SD0_D2, 1);
+	gpio_set_value(SABRESD_SD0_D3, 1);
+	mdelay(10);
+	gpio_set_value(SABRESD_SD0_CLK, 0);
+	gpio_set_value(SABRESD_SD0_CMD, 0);
+	gpio_set_value(SABRESD_SD0_D0, 0);
+	gpio_set_value(SABRESD_SD0_D1, 0);
+	gpio_set_value(SABRESD_SD0_D2, 0);
+	gpio_set_value(SABRESD_SD0_D3, 0);
+	}
+*/
+
+	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
 
 	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
 	imx6q_sabresd_init_usb();
@@ -2078,7 +2189,7 @@ static void __init mx6_sabresd_board_init(void)
 
 	gps_power_on(true);
 	/* Register charger chips */
-	platform_device_register(&sabresd_max8903_charger_1);
+//	platform_device_register(&sabresd_max8903_charger_1);
 	pm_power_off = mx6_snvs_poweroff;
 	imx6q_add_busfreq();
 

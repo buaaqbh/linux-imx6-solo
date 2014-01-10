@@ -2355,8 +2355,18 @@ static long mxc_v4l_do_ioctl(struct file *file,
 		}
 		break;
 	}
+	case VIDIOC_QUERYCTRL: {
+		struct v4l2_queryctrl *p = arg;
+		if (cam->sensor)
+			retval = vidioc_int_queryctrl(cam->sensor, p);
+		else {
+			pr_err("ERROR: v4l2 capture: slave not found!\n");
+			retval = -ENODEV;
+		}
+		break;
+	}
 	case VIDIOC_TRY_FMT:
-	case VIDIOC_QUERYCTRL:
+//	case VIDIOC_QUERYCTRL:
 	case VIDIOC_G_TUNER:
 	case VIDIOC_S_TUNER:
 	case VIDIOC_G_FREQUENCY:
