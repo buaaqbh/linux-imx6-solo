@@ -392,6 +392,9 @@ static const struct i2c_reg_value tvp5150_init_enable[] = {
 	{
 		TVP5150_MISC_CTL, 0x09
 	},
+//	{
+//		TVP5150_GENLOCK, 0x05
+//	},
 	{
 		0xff, 0xff
 	}
@@ -549,7 +552,7 @@ static int tvp5150_reset (struct sensor *s)
 	/* Ready */
 	tvp5150_set_std(s, s->std_id);
 
-//	tvp5150_status(1);
+	tvp5150_status(1);
 
 	return 0;
 }
