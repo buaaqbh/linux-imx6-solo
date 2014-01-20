@@ -1888,7 +1888,7 @@ static struct platform_device mx6q_power_control_device = {
 static void __init imx6q_sabresd_power_control_init(void)
 {
 	gpio_request(SABRESD_12V_EN, "sys12v-en");
-	gpio_direction_output(SABRESD_12V_EN, 0);
+	gpio_direction_output(SABRESD_12V_EN, 1);
 
 	gpio_request(SABRESD_ZIGBEE_PWR_EN, "zigbee-pwr-en");
 	gpio_direction_output(SABRESD_ZIGBEE_PWR_EN, 0);
