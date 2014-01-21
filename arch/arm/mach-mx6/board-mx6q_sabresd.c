@@ -293,7 +293,7 @@ static inline void mx6q_sabresd_init_uart(void)
 
 	imx6q_add_imx_uart(0, NULL);
 	imx6q_add_imx_uart(1, NULL);
-	imx6q_add_imx_uart(4, NULL);
+	imx6q_add_imx_uart(3, NULL);
 }
 
 static int mx6q_sabresd_fec_phy_init(struct phy_device *phydev)

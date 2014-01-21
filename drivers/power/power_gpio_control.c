@@ -37,12 +37,12 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 		return -1;
 
 	if (value == 0) {
-		printk("Power Control: 12V Power Off.\n");
-		gpio_set_value(pdata->gpio_power_zigbee_en, 1);
+		printk("Power Control: Sensor 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: 12V Power On.\n");
-		gpio_set_value(pdata->gpio_power_12v_en, 0);
+		printk("Power Control: Sensor 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
 	}
 	else {
 		printk("Power Control: Invalid Parameter.\n");

@@ -392,9 +392,9 @@ static const struct i2c_reg_value tvp5150_init_enable[] = {
 	{
 		TVP5150_MISC_CTL, 0x09
 	},
-//	{
-//		TVP5150_GENLOCK, 0x05
-//	},
+	{
+		0x0f, 0x0a
+	},
 	{
 		0xff, 0xff
 	}
