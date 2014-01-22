@@ -173,6 +173,15 @@ static struct v4l2_queryctrl tvp5150_qctrl[] = {
 	.step = 0x1,		/* check this value */
 	.default_value = 127,	/* check this value */
 	.flags = 0,
+	}, {
+	.id = V4L2_CID_HUE,
+	.type = V4L2_CTRL_TYPE_INTEGER,
+	.name = "Hue",
+	.minimum = -128,
+	.maximum = 127,
+	.step = 0x1,
+	.default_value = 0,
+	.flags = 0,
 	}
 };
 
@@ -387,18 +396,301 @@ static int tvp5150_status (int full)
  * mxc_v4l2_capture interface.
  ***********************************************************************/
 
+#if 0
 /* Default values as sugested at TVP5150AM1 datasheet */
 static const struct i2c_reg_value tvp5150_init_enable[] = {
 	{
 		TVP5150_MISC_CTL, 0x09
 	},
 	{
-		0x0f, 0x0a
-	},
-	{
 		0xff, 0xff
 	}
 };
+#else
+/* Default values as sugested at TVP5150AM1 datasheet */
+static const struct i2c_reg_value tvp5150_init_enable[] = {
+	{
+		TVP5150_CONF_SHARED_PIN, 2
+	},{	/* Automatic offset and AGC enabled */
+		TVP5150_ANAL_CHL_CTL, 0x15
+	},{	/* Activate YCrCb output 0x9 or 0xd ? */
+		TVP5150_MISC_CTL, 0x6f
+	},{	/* Activates video std autodetection for all standards */
+		TVP5150_AUTOSW_MSK, 0x0
+	},{	/* Default format: 0x47. For 4:2:2: 0x40 */
+		TVP5150_DATA_RATE_SEL, 0x47
+	},{
+		TVP5150_CHROMA_PROC_CTL_1, 0x0c
+	},{
+		TVP5150_CHROMA_PROC_CTL_2, 0x54
+	},{	/* Non documented, but initialized on WinTV USB2 */
+		0x27, 0x20
+	},{
+		0xff,0xff
+	}
+};
+#endif
+
+/* Default values as sugested at TVP5150AM1 datasheet */
+static const struct i2c_reg_value tvp5150_init_default[] = {
+	{ /* 0x00 */
+		TVP5150_VD_IN_SRC_SEL_1,0x00
+	},
+	{ /* 0x01 */
+		TVP5150_ANAL_CHL_CTL,0x15
+	},
+	{ /* 0x02 */
+		TVP5150_OP_MODE_CTL,0x00
+	},
+	{ /* 0x03 */
+		TVP5150_MISC_CTL,0x01
+	},
+	{ /* 0x06 */
+		TVP5150_COLOR_KIL_THSH_CTL,0x10
+	},
+	{ /* 0x07 */
+		TVP5150_LUMA_PROC_CTL_1,0x60
+	},
+	{ /* 0x08 */
+		TVP5150_LUMA_PROC_CTL_2,0x00
+	},
+	{ /* 0x09 */
+		TVP5150_BRIGHT_CTL,0x80
+	},
+	{ /* 0x0a */
+		TVP5150_SATURATION_CTL,0x80
+	},
+	{ /* 0x0b */
+		TVP5150_HUE_CTL,0x00
+	},
+	{ /* 0x0c */
+		TVP5150_CONTRAST_CTL,0x80
+	},
+	{ /* 0x0d */
+		TVP5150_DATA_RATE_SEL,0x47
+	},
+	{ /* 0x0e */
+		TVP5150_LUMA_PROC_CTL_3,0x00
+	},
+	{ /* 0x0f */
+		TVP5150_CONF_SHARED_PIN,0x08
+	},
+	{ /* 0x11 */
+		TVP5150_ACT_VD_CROP_ST_MSB,0x00
+	},
+	{ /* 0x12 */
+		TVP5150_ACT_VD_CROP_ST_LSB,0x00
+	},
+	{ /* 0x13 */
+		TVP5150_ACT_VD_CROP_STP_MSB,0x00
+	},
+	{ /* 0x14 */
+		TVP5150_ACT_VD_CROP_STP_LSB,0x00
+	},
+	{ /* 0x15 */
+		TVP5150_GENLOCK,0x01
+	},
+	{ /* 0x16 */
+		TVP5150_HORIZ_SYNC_START,0x80
+	},
+	{ /* 0x18 */
+		TVP5150_VERT_BLANKING_START,0x00
+	},
+	{ /* 0x19 */
+		TVP5150_VERT_BLANKING_STOP,0x00
+	},
+	{ /* 0x1a */
+		TVP5150_CHROMA_PROC_CTL_1,0x0c
+	},
+	{ /* 0x1b */
+		TVP5150_CHROMA_PROC_CTL_2,0x14
+	},
+	{ /* 0x1c */
+		TVP5150_INT_RESET_REG_B,0x00
+	},
+	{ /* 0x1d */
+		TVP5150_INT_ENABLE_REG_B,0x00
+	},
+	{ /* 0x1e */
+		TVP5150_INTT_CONFIG_REG_B,0x00
+	},
+	{ /* 0x28 */
+		TVP5150_VIDEO_STD,0x00
+	},
+	{ /* 0x2e */
+		TVP5150_MACROVISION_ON_CTR,0x0f
+	},
+	{ /* 0x2f */
+		TVP5150_MACROVISION_OFF_CTR,0x01
+	},
+	{ /* 0xbb */
+		TVP5150_TELETEXT_FIL_ENA,0x00
+	},
+	{ /* 0xc0 */
+		TVP5150_INT_STATUS_REG_A,0x00
+	},
+	{ /* 0xc1 */
+		TVP5150_INT_ENABLE_REG_A,0x00
+	},
+	{ /* 0xc2 */
+		TVP5150_INT_CONF,0x04
+	},
+	{ /* 0xc8 */
+		TVP5150_FIFO_INT_THRESHOLD,0x80
+	},
+	{ /* 0xc9 */
+		TVP5150_FIFO_RESET,0x00
+	},
+	{ /* 0xca */
+		TVP5150_LINE_NUMBER_INT,0x00
+	},
+	{ /* 0xcb */
+		TVP5150_PIX_ALIGN_REG_LOW,0x4e
+	},
+	{ /* 0xcc */
+		TVP5150_PIX_ALIGN_REG_HIGH,0x00
+	},
+	{ /* 0xcd */
+		TVP5150_FIFO_OUT_CTRL,0x01
+	},
+	{ /* 0xcf */
+		TVP5150_FULL_FIELD_ENA,0x00
+	},
+	{ /* 0xd0 */
+		TVP5150_LINE_MODE_INI,0x00
+	},
+	{ /* 0xfc */
+		TVP5150_FULL_FIELD_MODE_REG,0x7f
+	},
+	{ /* end of data */
+		0xff,0xff
+	}
+};
+
+struct tvp5150_vbi_type {
+	unsigned int vbi_type;
+	unsigned int ini_line;
+	unsigned int end_line;
+	unsigned int by_field :1;
+};
+
+struct i2c_vbi_ram_value {
+	u16 reg;
+	struct tvp5150_vbi_type type;
+	unsigned char values[16];
+};
+
+/* This struct have the values for each supported VBI Standard
+ * by
+ tvp5150_vbi_types should follow the same order as vbi_ram_default
+ * value 0 means rom position 0x10, value 1 means rom position 0x30
+ * and so on. There are 16 possible locations from 0 to 15.
+ */
+
+static struct i2c_vbi_ram_value vbi_ram_default[] =
+{
+	/* FIXME: Current api doesn't handle all VBI types, those not
+	   yet supported are placed under #if 0 */
+#if 0
+	{0x010, /* Teletext, SECAM, WST System A */
+		{V4L2_SLICED_TELETEXT_SECAM,6,23,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0xe7, 0x2e, 0x20, 0x26,
+		  0xe6, 0xb4, 0x0e, 0x00, 0x00, 0x00, 0x10, 0x00 }
+	},
+#endif
+	{0x030, /* Teletext, PAL, WST System B */
+		{V4L2_SLICED_TELETEXT_B,6,22,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0x27, 0x2e, 0x20, 0x2b,
+		  0xa6, 0x72, 0x10, 0x00, 0x00, 0x00, 0x10, 0x00 }
+	},
+#if 0
+	{0x050, /* Teletext, PAL, WST System C */
+		{V4L2_SLICED_TELETEXT_PAL_C,6,22,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0xe7, 0x2e, 0x20, 0x22,
+		  0xa6, 0x98, 0x0d, 0x00, 0x00, 0x00, 0x10, 0x00 }
+	},
+	{0x070, /* Teletext, NTSC, WST System B */
+		{V4L2_SLICED_TELETEXT_NTSC_B,10,21,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0x27, 0x2e, 0x20, 0x23,
+		  0x69, 0x93, 0x0d, 0x00, 0x00, 0x00, 0x10, 0x00 }
+	},
+	{0x090, /* Tetetext, NTSC NABTS System C */
+		{V4L2_SLICED_TELETEXT_NTSC_C,10,21,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0xe7, 0x2e, 0x20, 0x22,
+		  0x69, 0x93, 0x0d, 0x00, 0x00, 0x00, 0x15, 0x00 }
+	},
+	{0x0b0, /* Teletext, NTSC-J, NABTS System D */
+		{V4L2_SLICED_TELETEXT_NTSC_D,10,21,1},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0xa7, 0x2e, 0x20, 0x23,
+		  0x69, 0x93, 0x0d, 0x00, 0x00, 0x00, 0x10, 0x00 }
+	},
+	{0x0d0, /* Closed Caption, PAL/SECAM */
+		{V4L2_SLICED_CAPTION_625,22,22,1},
+		{ 0xaa, 0x2a, 0xff, 0x3f, 0x04, 0x51, 0x6e, 0x02,
+		  0xa6, 0x7b, 0x09, 0x00, 0x00, 0x00, 0x27, 0x00 }
+	},
+#endif
+	{0x0f0, /* Closed Caption, NTSC */
+		{V4L2_SLICED_CAPTION_525,21,21,1},
+		{ 0xaa, 0x2a, 0xff, 0x3f, 0x04, 0x51, 0x6e, 0x02,
+		  0x69, 0x8c, 0x09, 0x00, 0x00, 0x00, 0x27, 0x00 }
+	},
+	{0x110, /* Wide Screen Signal, PAL/SECAM */
+		{V4L2_SLICED_WSS_625,23,23,1},
+		{ 0x5b, 0x55, 0xc5, 0xff, 0x00, 0x71, 0x6e, 0x42,
+		  0xa6, 0xcd, 0x0f, 0x00, 0x00, 0x00, 0x3a, 0x00 }
+	},
+#if 0
+	{0x130, /* Wide Screen Signal, NTSC C */
+		{V4L2_SLICED_WSS_525,20,20,1},
+		{ 0x38, 0x00, 0x3f, 0x00, 0x00, 0x71, 0x6e, 0x43,
+		  0x69, 0x7c, 0x08, 0x00, 0x00, 0x00, 0x39, 0x00 }
+	},
+	{0x150, /* Vertical Interval Timecode (VITC), PAL/SECAM */
+		{V4l2_SLICED_VITC_625,6,22,0},
+		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x8f, 0x6d, 0x49,
+		  0xa6, 0x85, 0x08, 0x00, 0x00, 0x00, 0x4c, 0x00 }
+	},
+	{0x170, /* Vertical Interval Timecode (VITC), NTSC */
+		{V4l2_SLICED_VITC_525,10,20,0},
+		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x8f, 0x6d, 0x49,
+		  0x69, 0x94, 0x08, 0x00, 0x00, 0x00, 0x4c, 0x00 }
+	},
+#endif
+	{0x190, /* Video Program System (VPS), PAL */
+		{V4L2_SLICED_VPS,16,16,0},
+		{ 0xaa, 0xaa, 0xff, 0xff, 0xba, 0xce, 0x2b, 0x0d,
+		  0xa6, 0xda, 0x0b, 0x00, 0x00, 0x00, 0x60, 0x00 }
+	},
+	/* 0x1d0 User programmable */
+
+	/* End of struct */
+	{ (u16)-1 }
+};
+
+static int tvp5150_vdp_init(const struct i2c_vbi_ram_value *regs)
+{
+	unsigned int i;
+
+	/* Disable Full Field */
+	tvp5150_write_reg(TVP5150_FULL_FIELD_ENA, 0);
+
+	/* Before programming, Line mode should be at 0xff */
+	for (i=TVP5150_LINE_MODE_INI; i<=TVP5150_LINE_MODE_END; i++)
+		tvp5150_write_reg(i, 0xff);
+
+	/* Load Ram Table */
+	while (regs->reg != (u16)-1 ) {
+		tvp5150_write_reg(TVP5150_CONF_RAM_ADDR_HIGH,regs->reg>>8);
+		tvp5150_write_reg(TVP5150_CONF_RAM_ADDR_LOW,regs->reg);
+
+		for (i=0;i<16;i++)
+			tvp5150_write_reg(TVP5150_VDP_CONF_RAM_DATA,regs->values[i]);
+
+		regs++;
+	}
+	return 0;
+}
 
 /****************************************************************************
  * Basic Functions
@@ -527,27 +819,41 @@ static void tvp5150_get_std(v4l2_std_id *std)
 /* Reset the chip */
 static int tvp5150_reset (struct sensor *s)
 {
-	u8 maj_rom, min_rom;
+	u8 msb_id, lsb_id, msb_rom, lsb_rom;
 
-	/* Get ROM version */
-	maj_rom = tvp5150_read(TVP5150_ROM_MAJOR_VER);
-	min_rom = tvp5150_read(TVP5150_ROM_MINOR_VER);
-	dev_dbg(&tvp5150_data.sen.i2c_client->dev, "rom version %d.%d\n", maj_rom, min_rom);
+	msb_id=tvp5150_read(TVP5150_MSB_DEV_ID);
+	lsb_id=tvp5150_read(TVP5150_LSB_DEV_ID);
+	msb_rom=tvp5150_read(TVP5150_ROM_MAJOR_VER);
+	lsb_rom=tvp5150_read(TVP5150_ROM_MINOR_VER);
+
+	dev_err(&tvp5150_data.sen.i2c_client->dev, "rom version %d.%d\n", msb_rom, lsb_rom);
 
 	/* TVP5150AM1 */
-	if ( maj_rom == 4 && min_rom == 0 ) {
-		dev_dbg(&tvp5150_data.sen.i2c_client->dev, "tvp5150am1 detected\n");
+	if ( msb_rom == 4 && lsb_rom == 0 ) {
+		dev_err(&tvp5150_data.sen.i2c_client->dev, "tvp5150am1 detected\n");
 		tvp5150_write_reg(TVP5150_REV_SELECT, 0);
 	/* TVP5150A */
 	} else {
-		dev_dbg(&tvp5150_data.sen.i2c_client->dev, "tvp5150a detected\n");
+		dev_err(&tvp5150_data.sen.i2c_client->dev, "tvp5150a detected\n");
 	}
+
+	/* Initializes TVP5150 to its default values */
+	tvp5150_write_array(tvp5150_init_default);
+
+	/* Initializes VDP registers */
+	tvp5150_vdp_init(vbi_ram_default);
 
 	/* Initialiss TVP5150 to stream enabled values */
 	tvp5150_write_array(tvp5150_init_enable);
 
 	/* Select input */
 	tvp5150_selmux(s);
+
+	/* Initialize image preferences */
+	tvp5150_write_reg(TVP5150_BRIGHT_CTL, 128);
+	tvp5150_write_reg(TVP5150_CONTRAST_CTL, 128);
+	tvp5150_write_reg(TVP5150_SATURATION_CTL, 128);
+	tvp5150_write_reg(TVP5150_HUE_CTL, 0);
 
 	/* Ready */
 	tvp5150_set_std(s, s->std_id);
@@ -590,7 +896,7 @@ static int ioctl_g_ifparm(struct v4l2_int_device *s, struct v4l2_ifparm *p)
 	memset(p, 0, sizeof(*p));
 	p->if_type = V4L2_IF_TYPE_BT656; /* This is the only possibility. */
 	p->u.bt656.mode = V4L2_IF_TYPE_BT656_MODE_NOBT_8BIT;
-	p->u.bt656.nobt_hs_inv = 1;
+//	p->u.bt656.nobt_hs_inv = 1;
 	p->u.bt656.bt_sync_correct = 1;
 
 	/* tvp5150 has a dedicated clock so no clock settings needed. */
@@ -823,6 +1129,7 @@ static int ioctl_g_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 	case V4L2_CID_HUE:
 		dev_dbg(&tvp5150_data.sen.i2c_client->dev,
 			"   V4L2_CID_HUE\n");
+		tvp5150_data.sen.hue = tvp5150_read(TVP5150_HUE_CTL);
 		vc->value = tvp5150_data.sen.hue;
 		break;
 	case V4L2_CID_AUTO_WHITE_BALANCE:
@@ -921,6 +1228,9 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 	case V4L2_CID_HUE:
 		dev_dbg(&tvp5150_data.sen.i2c_client->dev,
 			"   V4L2_CID_HUE\n");
+		tmp = vc->value;
+		tvp5150_write_reg(TVP5150_HUE_CTL, tmp);
+		tvp5150_data.sen.hue = vc->value;
 		break;
 	case V4L2_CID_AUTO_WHITE_BALANCE:
 		dev_dbg(&tvp5150_data.sen.i2c_client->dev,
