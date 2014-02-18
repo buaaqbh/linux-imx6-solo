@@ -858,7 +858,7 @@ static int tvp5150_reset (struct sensor *s)
 	/* Ready */
 	tvp5150_set_std(s, s->std_id);
 
-	tvp5150_status(1);
+//	tvp5150_status(1);
 
 	return 0;
 }

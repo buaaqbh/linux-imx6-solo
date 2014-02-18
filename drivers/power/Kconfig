@@ -250,4 +250,11 @@ config BATTERY_DA9052
 	  Say Y here to enable support for batteries charger integrated into
 	  DA9052 PMIC.
 
+config BATTERY_ADS1000
+	tristate "Dialog ADS1000 Battery"
+	depends on I2C
+	help
+	  Say Y here to enable support for batteries charger integrated into
+	  DA9052 PMIC.
+
 endif # POWER_SUPPLY
