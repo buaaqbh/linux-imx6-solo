@@ -1881,6 +1881,8 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_codec_en = -1, //SABRESD_CODEC_PWR_EN,
 	.gpio_power_pcie_en = -1, //SABRESD_PCIE_PWR_EN,
 	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
+	.gpio_rs485_tx_en = SABRESD_RS485_DE,
+	.gpio_rs485_rx_en = SABRESD_RS485_RE,
 };
 
 static struct platform_device mx6q_power_control_device = {
@@ -1978,18 +1980,18 @@ static void __init mx6_sabresd_board_init(void)
 		for (i = 0; i < 2 && i < ARRAY_SIZE(sabresd_fb_data); i++)
 			imx6q_add_ipuv3fb(i, &sabresd_fb_data[i]);
 
-	imx6q_add_vdoa();
-	imx6q_add_mipi_dsi(&mipi_dsi_pdata);
-	imx6q_add_lcdif(&lcdif_data);
-	imx6q_add_ldb(&ldb_data);
-	imx6q_add_v4l2_output(0);
+//	imx6q_add_vdoa();
+//	imx6q_add_mipi_dsi(&mipi_dsi_pdata);
+//	imx6q_add_lcdif(&lcdif_data);
+//	imx6q_add_ldb(&ldb_data);
+//	imx6q_add_v4l2_output(0);
 	imx6q_add_v4l2_capture(0, &capture_data[0]);
 //	imx6q_add_v4l2_capture(1, &capture_data[1]);
 //	imx6q_add_mipi_csi2(&mipi_csi2_pdata);
 	imx6q_add_imx_snvs_rtc();
 
-	if (1 == caam_enabled)
-		imx6q_add_imx_caam();
+//	if (1 == caam_enabled)
+//		imx6q_add_imx_caam();
 
 	if (board_is_mx6_reva()) {
 		strcpy(mxc_i2c0_board_info[0].type, "wm8958");
@@ -2018,12 +2020,12 @@ static void __init mx6_sabresd_board_init(void)
 		mx6q_sabresd_init_pfuze100(SABRESD_PFUZE_INT);
 	}
 	/* SPI */
-	imx6q_add_ecspi(0, &mx6q_sabresd_spi_data);
-	spi_device_init();
+//	imx6q_add_ecspi(0, &mx6q_sabresd_spi_data);
+//	spi_device_init();
 
-	imx6q_add_mxc_hdmi(&hdmi_data);
+//	imx6q_add_mxc_hdmi(&hdmi_data);
 
-	imx6q_add_anatop_thermal_imx(1, &mx6q_sabresd_anatop_thermal_data);
+//	imx6q_add_anatop_thermal_imx(1, &mx6q_sabresd_anatop_thermal_data);
 	imx6_init_fec(fec_data);
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 	/* Make sure the IOMUX_OBSRV_MUX1 is set to ENET_IRQ. */
@@ -2031,7 +2033,7 @@ static void __init mx6_sabresd_board_init(void)
 		OBSRV_MUX1_ENET_IRQ, OBSRV_MUX1_MASK);
 #endif
 
-	imx6q_add_pm_imx(0, &mx6q_sabresd_pm_data);
+//	imx6q_add_pm_imx(0, &mx6q_sabresd_pm_data);
 
 	/* Move sd4 to first because sd4 connect to emmc.
 	   Mfgtools want emmc is mmcblk0 and other sd card is mmcblk1.
@@ -2083,23 +2085,23 @@ static void __init mx6_sabresd_board_init(void)
 
 	imx6q_add_sdhci_usdhc_imx(0, &mx6q_sabresd_sd1_data);
 
-	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
+//	imx_add_viv_gpu(&imx6_gpu_data, &imx6q_gpu_pdata);
 	imx6q_sabresd_init_usb();
 	/* SATA is not supported by MX6DL/Solo */
 	if (cpu_is_mx6q()) {
 #ifdef CONFIG_SATA_AHCI_PLATFORM
-		imx6q_add_ahci(0, &mx6q_sabresd_sata_data);
+//		imx6q_add_ahci(0, &mx6q_sabresd_sata_data);
 #else
-		mx6q_sabresd_sata_init(NULL,
-			(void __iomem *)ioremap(MX6Q_SATA_BASE_ADDR, SZ_4K));
+//		mx6q_sabresd_sata_init(NULL,
+//			(void __iomem *)ioremap(MX6Q_SATA_BASE_ADDR, SZ_4K));
 #endif
 	}
-	imx6q_add_vpu();
-	imx6q_init_audio();
-	platform_device_register(&sabresd_vmmc_reg_devices);
-	imx_asrc_data.asrc_core_clk = clk_get(NULL, "asrc_clk");
-	imx_asrc_data.asrc_audio_clk = clk_get(NULL, "asrc_serial_clk");
-	imx6q_add_asrc(&imx_asrc_data);
+//	imx6q_add_vpu();
+//	imx6q_init_audio();
+//	platform_device_register(&sabresd_vmmc_reg_devices);
+//	imx_asrc_data.asrc_core_clk = clk_get(NULL, "asrc_clk");
+//	imx_asrc_data.asrc_audio_clk = clk_get(NULL, "asrc_serial_clk");
+//	imx6q_add_asrc(&imx_asrc_data);
 
 	/*
 	 * Disable HannStar touch panel CABC function,
@@ -2112,14 +2114,14 @@ static void __init mx6_sabresd_board_init(void)
 	gpio_request(SABRESD_CABC_EN1, "cabc-en1");
 	gpio_direction_output(SABRESD_CABC_EN1, 0);
 
-	imx6q_add_mxc_pwm(0);
-	imx6q_add_mxc_pwm(1);
-	imx6q_add_mxc_pwm(2);
-	imx6q_add_mxc_pwm(3);
-	imx6q_add_mxc_pwm_backlight(0, &mx6_sabresd_pwm_backlight_data);
+//	imx6q_add_mxc_pwm(0);
+//	imx6q_add_mxc_pwm(1);
+//	imx6q_add_mxc_pwm(2);
+//	imx6q_add_mxc_pwm(3);
+//	imx6q_add_mxc_pwm_backlight(0, &mx6_sabresd_pwm_backlight_data);
 
-	imx6q_add_otp();
-	imx6q_add_viim();
+//	imx6q_add_otp();
+//	imx6q_add_viim();
 	imx6q_add_imx2_wdt(0, NULL);
 	imx6q_add_dma();
 
@@ -2137,8 +2139,8 @@ static void __init mx6_sabresd_board_init(void)
 	gpio_request(SABRESD_ALS_INT, "als-int");
 	gpio_direction_input(SABRESD_ALS_INT);
 
-	imx6q_add_hdmi_soc();
-	imx6q_add_hdmi_soc_dai();
+//	imx6q_add_hdmi_soc();
+//	imx6q_add_hdmi_soc_dai();
 
 	if (cpu_is_mx6dl()) {
 		imx6dl_add_imx_pxp();
@@ -2188,7 +2190,7 @@ static void __init mx6_sabresd_board_init(void)
 
 	pcie_gpio_init();
 
-	imx6q_add_smsc911x();
+//	imx6q_add_smsc911x();
 
 	gps_power_on(true);
 	/* Register charger chips */
@@ -2197,7 +2199,7 @@ static void __init mx6_sabresd_board_init(void)
 	imx6q_add_busfreq();
 
 	/* Add PCIe RC interface support */
-	imx6q_add_pcie(&mx6_sabresd_pcie_data);
+//	imx6q_add_pcie(&mx6_sabresd_pcie_data);
 	if (cpu_is_mx6dl()) {
 		mxc_iomux_v3_setup_multiple_pads(mx6dl_arm2_elan_pads,
 						ARRAY_SIZE(mx6dl_arm2_elan_pads));

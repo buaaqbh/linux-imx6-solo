@@ -10,6 +10,8 @@ struct gpio_power_data {
 	int gpio_power_codec_en;
 	int gpio_power_pcie_en;
 	int gpio_power_wifi_en;
+	int gpio_rs485_tx_en;
+	int gpio_rs485_rx_en;
 };
 
 #endif
