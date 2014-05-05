@@ -39,12 +39,142 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 		return -1;
 
 	if (value == 0) {
-		printk("Power Control: Sensor 12v Power Off.\n");
+		printk("Power Control: System 12v Power Off.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 0);
+	}
+	else if (value > 0) {
+		printk("Power Control: System 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	return size;
+}
+
+static ssize_t power_can_12v_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_can_12v_en == -1))
+		return -1;
+
+	if (value == 0) {
+		printk("Power Control: Sensor CAN 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_can_12v_en, 0);
 	}
 	else if (value > 0) {
 		printk("Power Control: Sensor 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_can_12v_en, 1);
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	return size;
+}
+
+static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_rs485_12v_en == -1))
+		return -1;
+
+	if (value == 0) {
+		printk("Power Control: Sensor RS485 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
+	}
+	else if (value > 0) {
+		printk("Power Control: Sensor RS485 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	return size;
+}
+
+static ssize_t power_av_12v_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_av_12v_en == -1))
+		return -1;
+
+	if (value == 0) {
+		printk("Power Control: Sensor AV 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_av_12v_en, 0);
+	}
+	else if (value > 0) {
+		printk("Power Control: Sensor AV 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_av_12v_en, 1);
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	return size;
+}
+
+static ssize_t power_vout_12v_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_vout_12v_en == -1))
+		return -1;
+
+	if (value == 0) {
+		printk("Power Control: Sensor VOUT 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_vout_12v_en, 0);
+	}
+	else if (value > 0) {
+		printk("Power Control: Sensor VOUT 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_vout_12v_en, 1);
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	return size;
+}
+
+static ssize_t power_zigbee_12v_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_zigbee_12v_en == -1))
+		return -1;
+
+	if (value == 0) {
+		printk("Power Control: Sensor Zigbee 12v Power Off.\n");
+		gpio_set_value(pdata->gpio_power_zigbee_12v_en, 0);
+	}
+	else if (value > 0) {
+		printk("Power Control: Sensor Zigbee 12v Power On.\n");
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_zigbee_12v_en, 1);
 	}
 	else {
 		printk("Power Control: Invalid Parameter.\n");
@@ -190,11 +320,11 @@ static ssize_t power_pcie_store(struct device *dev, struct device_attribute *att
 
 	if (value == 0) {
 		printk("Power Control: PCIE Power Off.\n");
-		gpio_set_value(pdata->gpio_power_pcie_en, 1);
+		gpio_set_value(pdata->gpio_power_pcie_en, 0);
 	}
 	else if (value > 0) {
 		printk("Power Control: PCIE Power On.\n");
-		gpio_set_value(pdata->gpio_power_pcie_en, 0);
+		gpio_set_value(pdata->gpio_power_pcie_en, 1);
 	}
 	else {
 		printk("Power Control: Invalid Parameter.\n");
@@ -235,18 +365,16 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 
 	status = strict_strtol(buf, 0, &value);
 
-	if ((pdata == NULL) || (pdata->gpio_rs485_tx_en == -1) || (pdata->gpio_rs485_rx_en == -1))
+	if ((pdata == NULL) || (pdata->gpio_rs485_rx_en == -1))
 		return -1;
 
 	if (value == 0) {
 		printk("RS485 Direction: receive bytes.\n");
-		gpio_set_value(pdata->gpio_rs485_tx_en, 0);
 		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 		mdelay(50);
 	}
 	else if (value > 0) {
 		printk("RS485 Direction: send bytes.\n");
-		gpio_set_value(pdata->gpio_rs485_tx_en, 1);
 		gpio_set_value(pdata->gpio_rs485_rx_en, 1);
 		mdelay(50);
 	}
@@ -258,6 +386,11 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 }
 
 static DEVICE_ATTR(power_12v, 0666, NULL, power_12v_store);
+static DEVICE_ATTR(power_can_12v, 0666, NULL, power_can_12v_store);
+static DEVICE_ATTR(power_rs485_12v, 0666, NULL, power_rs485_12v_store);
+static DEVICE_ATTR(power_av_12v, 0666, NULL, power_av_12v_store);
+static DEVICE_ATTR(power_vout_12v, 0666, NULL, power_vout_12v_store);
+static DEVICE_ATTR(power_zigbee_12v, 0666, NULL, power_zigbee_12v_store);
 static DEVICE_ATTR(power_zigbee, 0666, NULL, power_zigbee_store);
 static DEVICE_ATTR(power_tvp5150, 0666, NULL, power_tvp5150_store);
 static DEVICE_ATTR(power_can, 0666, NULL, power_can_store);
@@ -274,6 +407,11 @@ static int __devinit power_gpio_probe(struct platform_device *pdev)
 	pdata = pdev->dev.platform_data;
 
 	printk(KERN_INFO "Power Control: gpio_power_12v_en = %d\n", pdata->gpio_power_12v_en);
+	printk(KERN_INFO "Power Control: gpio_power_can_12v_en = %d\n", pdata->gpio_power_can_12v_en);
+	printk(KERN_INFO "Power Control: gpio_power_rs485_12v_en = %d\n", pdata->gpio_power_rs485_12v_en);
+	printk(KERN_INFO "Power Control: gpio_power_av_12v_en = %d\n", pdata->gpio_power_av_12v_en);
+	printk(KERN_INFO "Power Control: gpio_power_vout_12v_en = %d\n", pdata->gpio_power_vout_12v_en);
+	printk(KERN_INFO "Power Control: gpio_power_zigbee_12v_en = %d\n", pdata->gpio_power_zigbee_12v_en);
 	printk(KERN_INFO "Power Control: gpio_power_zigbee_en = %d\n", pdata->gpio_power_zigbee_en);
 	printk(KERN_INFO "Power Control: gpio_power_tvp5150_en = %d\n", pdata->gpio_power_tvp5150_en);
 	printk(KERN_INFO "Power Control: gpio_power_can_en = %d\n", pdata->gpio_power_can_en);
@@ -281,12 +419,31 @@ static int __devinit power_gpio_probe(struct platform_device *pdev)
 	printk(KERN_INFO "Power Control: gpio_power_codec_en = %d\n", pdata->gpio_power_codec_en);
 	printk(KERN_INFO "Power Control: gpio_power_pcie_en = %d\n", pdata->gpio_power_pcie_en);
 	printk(KERN_INFO "Power Control: gpio_power_wifi_en = %d\n", pdata->gpio_power_wifi_en);
-	printk(KERN_INFO "RS485 Control: gpio_rs485_tx_en = %d\n", pdata->gpio_rs485_tx_en);
 	printk(KERN_INFO "RS485 Control: gpio_rs485_rx_en = %d\n", pdata->gpio_rs485_rx_en);
 
 	err = device_create_file(&pdev->dev, &dev_attr_power_12v);
         if (err != 0) {
                 printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_12v.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_can_12v);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_can_12v.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_rs485_12v);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485_12v.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_av_12v);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_av_12v.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_vout_12v);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_vout_12v.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_zigbee_12v);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_zigbee_12v.\n");
         }
 	err = device_create_file(&pdev->dev, &dev_attr_power_zigbee);
         if (err != 0) {

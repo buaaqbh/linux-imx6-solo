@@ -23,7 +23,7 @@
 static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* AUDMUX */
 //	MX6DL_PAD_CSI0_DAT4__AUDMUX_AUD3_TXC,
-	MX6DL_PAD_CSI0_DAT5__AUDMUX_AUD3_TXD,
+//	MX6DL_PAD_CSI0_DAT5__AUDMUX_AUD3_TXD,
 	MX6DL_PAD_CSI0_DAT6__AUDMUX_AUD3_TXFS,
 //	MX6DL_PAD_CSI0_DAT7__AUDMUX_AUD3_RXD,
 
@@ -101,7 +101,7 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	MX6DL_PAD_GPIO_7__CAN1_TXCAN,
 	MX6DL_PAD_GPIO_8__CAN1_RXCAN,
 	/* CAN1_STBY */
-	MX6DL_PAD_GPIO_9__GPIO_1_9,
+	MX6DL_PAD_GPIO_5__GPIO_1_5,
 
 	/* UART1 for debug */
 	MX6DL_PAD_CSI0_DAT10__UART1_TXD,
@@ -116,8 +116,6 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* UART5 for RS485 */
 	MX6DL_PAD_KEY_COL0__UART4_TXD,
 	MX6DL_PAD_KEY_ROW0__UART4_RXD,
-	/* RS485 DE */
-	MX6DL_PAD_ENET_TXD0__GPIO_1_30, 
 	/* RS485 RE */
 	MX6DL_PAD_ENET_RXD0__GPIO_1_27,
 
@@ -186,9 +184,9 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* DISP0_RST_B */
 //	MX6DL_PAD_ENET_TXD0__GPIO_1_30,
 	/* DISP_RST_B */
-	MX6DL_PAD_NANDF_CS0__GPIO_6_11,
+//	MX6DL_PAD_NANDF_CS0__GPIO_6_11,
 	/* DISP_PWR_EN */
-	MX6DL_PAD_NANDF_CS1__GPIO_6_14,
+//	MX6DL_PAD_NANDF_CS1__GPIO_6_14,
 	/* CABC_EN0 */
 	MX6DL_PAD_NANDF_CS2__GPIO_6_15,
 	/* CABC_EN1 */
@@ -206,10 +204,10 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* PCIE_RST_B */
 	MX6DL_PAD_GPIO_17__GPIO_7_12,
 	/* PCIE_PWR_EN */
+	MX6DL_PAD_NANDF_CS0__GPIO_6_11,
 	/* PCIE_WAKE_B */
 	MX6DL_PAD_CSI0_DATA_EN__GPIO_5_20,
 	/* PCIE_DIS_B */
-	MX6DL_PAD_CSI0_DAT7__GPIO_5_25,
 	MX6DL_PAD_CSI0_DAT4__GPIO_5_22,
 
 	/* PMIC_INT_B */
@@ -224,31 +222,43 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* 12 EN */
 	MX6DL_PAD_GPIO_0__GPIO_1_0,
 	/* RS485 Power EN */
-	MX6DL_PAD_GPIO_5__GPIO_1_5,
-	/* CAN Power EN */
 	MX6DL_PAD_GPIO_6__GPIO_1_6,
+	/* CAN Power EN */
+	MX6DL_PAD_NANDF_ALE__GPIO_6_8,
 	/* Zigbee Powre En */
 	MX6DL_PAD_EIM_D23__GPIO_3_23,
 	/* Zigbee Reset */
 	MX6DL_PAD_EIM_D22__GPIO_3_22,
+
 	/* TVP5150 PWR_EN */
 	MX6DL_PAD_GPIO_2__GPIO_1_2,
 	/* TVP5150 Reset */
 	MX6DL_PAD_SD3_DAT3__GPIO_7_7,
 	/* TVP5150 PDN */
-	MX6DL_PAD_NANDF_ALE__GPIO_6_8,
+	MX6DL_PAD_NANDF_WP_B__GPIO_6_9,
 	MX6DL_PAD_SD3_DAT2__GPIO_7_6,		 /* TVP5150 FID */
 	MX6DL_PAD_NANDF_D4__GPIO_2_4, 		/* tvp5150 intrq */
 	MX6DL_PAD_NANDF_D5__GPIO_2_5, 		/* tvp5150 AVID */
 
 	/* Codec Power en */
 	MX6DL_PAD_EIM_D16__GPIO_3_16,
+
 	/* Wifi Power en */
-	MX6DL_PAD_NANDF_WP_B__GPIO_6_9,
+	MX6DL_PAD_EIM_A18__GPIO_2_20,
 	/* Wifi Wakeup */
 	MX6DL_PAD_EIM_D19__GPIO_3_19,
 	/* Wifi CS */
 	MX6DL_PAD_NANDF_D3__GPIO_2_3,
+
+	/* 12v control gpio */
+	MX6DL_PAD_EIM_A20__GPIO_2_18, 	/* CAN Device */
+	MX6DL_PAD_NANDF_CS1__GPIO_6_14,	/* RS485 Device */
+	MX6DL_PAD_GPIO_9__GPIO_1_9, 	/* AV Device */
+	MX6DL_PAD_ENET_TXD0__GPIO_1_30, /* Vout Device, backup */
+	MX6DL_PAD_EIM_A23__GPIO_6_6, 	/* Zigbee Device */
+	
+	/* System LED Control */
+	MX6DL_PAD_CSI0_DAT5__GPIO_5_23,
 };
 
 static iomux_v3_cfg_t mx6dl_sabresd_csi0_sensor_pads[] = {

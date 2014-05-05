@@ -929,6 +929,9 @@ static int ioctl_s_power(struct v4l2_int_device *s, int on)
 //		if (tvp5150_write_reg(TVP5150_OP_MODE_CTL, 0x00) != 0)
 //			return -EIO;
 
+		if (tvin_plat->pwdn)
+			tvin_plat->pwdn(0);
+
 		/* Full chip reset */
 		tvp5150_reset(&tvp5150_data);
 
@@ -940,6 +943,8 @@ static int ioctl_s_power(struct v4l2_int_device *s, int on)
 	} else if (!on && sensor->sen.on) {
 //		if (tvp5150_write_reg(TVP5150_OP_MODE_CTL, 0x01) != 0)
 //			return -EIO;
+		if (tvin_plat->pwdn)
+			tvin_plat->pwdn(1);
 		gpio_sensor_inactive();
 	}
 
