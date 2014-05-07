@@ -27,6 +27,13 @@
 
 */
 
+//#define P_DEBUG
+#ifdef P_DEBUG
+#define dprintk(format, arg...) printk(KERN_ALERT format, ## arg)
+#else
+#define dprintk(format, arg...) do {} while (0)
+#endif
+
 static struct gpio_power_data *pdata = NULL;
 static volatile int system_12v_count = 0;
 static volatile int can_12v_count = 0;
@@ -57,7 +64,7 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: System 12v Power Off.\n");
+		dprintk("Power Control: System 12v Power Off.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 0);
 		if (system_12v_count > 0)
 			system_12v_count--;
@@ -65,7 +72,7 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 			gpio_set_value(pdata->gpio_power_12v_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: System 12v Power On.\n");
+		dprintk("Power Control: System 12v Power On.\n");
 		system_12v_count++;
 	}
 	else {
@@ -90,14 +97,14 @@ static ssize_t power_can_12v_store(struct device *dev, struct device_attribute *
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Sensor CAN 12v Power Off.\n");
+		dprintk("Power Control: Sensor CAN 12v Power Off.\n");
 		if (can_12v_count > 0)
 			can_12v_count--;
 		if (can_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_can_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: Sensor 12v Power On.\n");
+		dprintk("Power Control: Sensor 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_can_12v_en, 1);
 		can_12v_count++;
@@ -124,14 +131,14 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Sensor RS485 12v Power Off.\n");
+		dprintk("Power Control: Sensor RS485 12v Power Off.\n");
 		if (rs485_12v_count > 0)
 			rs485_12v_count--;
 		if (rs485_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: Sensor RS485 12v Power On.\n");
+		dprintk("Power Control: Sensor RS485 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
 		rs485_12v_count++;
@@ -158,14 +165,14 @@ static ssize_t power_av_12v_store(struct device *dev, struct device_attribute *a
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Sensor AV 12v Power Off.\n");
+		dprintk("Power Control: Sensor AV 12v Power Off.\n");
 		if (av_12v_count > 0)
 			av_12v_count--;
 		if (av_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_av_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: Sensor AV 12v Power On.\n");
+		dprintk("Power Control: Sensor AV 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_av_12v_en, 1);
 		av_12v_count++;
@@ -192,14 +199,14 @@ static ssize_t power_vout_12v_store(struct device *dev, struct device_attribute 
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Sensor VOUT 12v Power Off.\n");
+		dprintk("Power Control: Sensor VOUT 12v Power Off.\n");
 		if (vout_12v_count > 0)
 			vout_12v_count--;
 		if (vout_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_vout_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: Sensor VOUT 12v Power On.\n");
+		dprintk("Power Control: Sensor VOUT 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_vout_12v_en, 1);
 		vout_12v_count++;
@@ -226,14 +233,14 @@ static ssize_t power_zigbee_12v_store(struct device *dev, struct device_attribut
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Sensor Zigbee 12v Power Off.\n");
+		dprintk("Power Control: Sensor Zigbee 12v Power Off.\n");
 		if (zigbee_12v_count > 0)
 			zigbee_12v_count--;
 		if (zigbee_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_zigbee_12v_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: Sensor Zigbee 12v Power On.\n");
+		dprintk("Power Control: Sensor Zigbee 12v Power On.\n");
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_zigbee_12v_en, 1);
 		zigbee_12v_count++;
@@ -260,14 +267,14 @@ static ssize_t power_zigbee_store(struct device *dev, struct device_attribute *a
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Zigbee Power Off.\n");
+		dprintk("Power Control: Zigbee Power Off.\n");
 		if (zigbee_chip_count > 0)
 			zigbee_chip_count--;
 		if (zigbee_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_zigbee_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: Zigbee Power On.\n");
+		dprintk("Power Control: Zigbee Power On.\n");
 		gpio_set_value(pdata->gpio_power_zigbee_en, 0);
 		zigbee_chip_count++;
 	}
@@ -293,14 +300,14 @@ static ssize_t power_tvp5150_store(struct device *dev, struct device_attribute *
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: TVP5150 Power Off.\n");
+		dprintk("Power Control: TVP5150 Power Off.\n");
 		if (tvp5150_chip_count > 0)
 			tvp5150_chip_count--;
 		if (tvp5150_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_tvp5150_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: TVP5150 Power On.\n");
+		dprintk("Power Control: TVP5150 Power On.\n");
 		gpio_set_value(pdata->gpio_power_tvp5150_en, 0);
 		tvp5150_chip_count++;
 	}
@@ -326,14 +333,14 @@ static ssize_t power_can_store(struct device *dev, struct device_attribute *attr
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: CAN Power Off.\n");
+		dprintk("Power Control: CAN Power Off.\n");
 		if (can_chip_count > 0)
 			can_chip_count--;
 		if (can_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_can_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: CAN Power On.\n");
+		dprintk("Power Control: CAN Power On.\n");
 		gpio_set_value(pdata->gpio_power_can_en, 1);
 		can_chip_count++;
 	}
@@ -359,14 +366,14 @@ static ssize_t power_rs485_store(struct device *dev, struct device_attribute *at
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: RS485 Power Off.\n");
+		dprintk("Power Control: RS485 Power Off.\n");
 		if (rs485_chip_count > 0)
 			rs485_chip_count--;
 		if (rs485_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_rs485_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: RS485 Power On.\n");
+		dprintk("Power Control: RS485 Power On.\n");
 		gpio_set_value(pdata->gpio_power_rs485_en, 0);
 		rs485_chip_count++;
 	}
@@ -392,14 +399,14 @@ static ssize_t power_codec_store(struct device *dev, struct device_attribute *at
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: Codec Power Off.\n");
+		dprintk("Power Control: Codec Power Off.\n");
 		if (codec_chip_count > 0)
 			codec_chip_count--;
 		if (codec_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_codec_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: Codec Power On.\n");
+		dprintk("Power Control: Codec Power On.\n");
 		gpio_set_value(pdata->gpio_power_codec_en, 0);
 		codec_chip_count++;
 	}
@@ -425,14 +432,14 @@ static ssize_t power_pcie_store(struct device *dev, struct device_attribute *att
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: PCIE Power Off.\n");
+		dprintk("Power Control: PCIE Power Off.\n");
 		if (pcie_chip_count > 0)
 			pcie_chip_count--;
 		if (pcie_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_pcie_en, 0);
 	}
 	else if (value > 0) {
-		printk("Power Control: PCIE Power On.\n");
+		dprintk("Power Control: PCIE Power On.\n");
 		gpio_set_value(pdata->gpio_power_pcie_en, 1);
 		pcie_chip_count++;
 	}
@@ -458,14 +465,14 @@ static ssize_t power_wifi_store(struct device *dev, struct device_attribute *att
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		printk("Power Control: WIFI Power Off.\n");
+		dprintk("Power Control: WIFI Power Off.\n");
 		if (wifi_chip_count > 0)
 			wifi_chip_count--;
 		if (wifi_chip_count == 0)
 			gpio_set_value(pdata->gpio_power_wifi_en, 1);
 	}
 	else if (value > 0) {
-		printk("Power Control: WIFI Power On.\n");
+		dprintk("Power Control: WIFI Power On.\n");
 		gpio_set_value(pdata->gpio_power_wifi_en, 0);
 		wifi_chip_count++;
 	}
@@ -489,12 +496,12 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 		return -1;
 
 	if (value == 0) {
-		printk("RS485 Direction: receive bytes.\n");
+		dprintk("RS485 Direction: receive bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 		mdelay(50);
 	}
 	else if (value > 0) {
-		printk("RS485 Direction: send bytes.\n");
+		dprintk("RS485 Direction: send bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 1);
 		mdelay(50);
 	}

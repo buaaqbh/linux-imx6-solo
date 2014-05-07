@@ -2138,7 +2138,7 @@ static void __init mx6_sabresd_board_init(void)
 //			(void __iomem *)ioremap(MX6Q_SATA_BASE_ADDR, SZ_4K));
 #endif
 	}
-//	imx6q_add_vpu();
+	imx6q_add_vpu();
 //	imx6q_init_audio();
 //	platform_device_register(&sabresd_vmmc_reg_devices);
 //	imx_asrc_data.asrc_core_clk = clk_get(NULL, "asrc_clk");
