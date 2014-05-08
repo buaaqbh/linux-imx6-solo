@@ -64,15 +64,15 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: System 12v Power Off.\n");
-		gpio_set_value(pdata->gpio_power_12v_en, 0);
+		dprintk("Power Control: System 12v Power Off, count = %d.\n", system_12v_count);
 		if (system_12v_count > 0)
 			system_12v_count--;
 		if (system_12v_count == 0)
-			gpio_set_value(pdata->gpio_power_12v_en, 1);
+			gpio_set_value(pdata->gpio_power_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: System 12v Power On.\n");
+		dprintk("Power Control: System 12v Power On, count = %d.\n", system_12v_count);
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		system_12v_count++;
 	}
 	else {
@@ -97,14 +97,14 @@ static ssize_t power_can_12v_store(struct device *dev, struct device_attribute *
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor CAN 12v Power Off.\n");
+		dprintk("Power Control: Sensor CAN 12v Power Off, count = %d.\n", can_12v_count);
 		if (can_12v_count > 0)
 			can_12v_count--;
 		if (can_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_can_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor 12v Power On.\n");
+		dprintk("Power Control: Sensor 12v Power On, count = %d.\n", can_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_can_12v_en, 1);
 		can_12v_count++;
@@ -131,14 +131,14 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor RS485 12v Power Off.\n");
+		dprintk("Power Control: Sensor RS485 12v Power Off, count = %d.\n", rs485_12v_count);
 		if (rs485_12v_count > 0)
 			rs485_12v_count--;
 		if (rs485_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor RS485 12v Power On.\n");
+		dprintk("Power Control: Sensor RS485 12v Power On, count = %d.\n", rs485_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
 		rs485_12v_count++;
@@ -165,14 +165,14 @@ static ssize_t power_av_12v_store(struct device *dev, struct device_attribute *a
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor AV 12v Power Off.\n");
+		dprintk("Power Control: Sensor AV 12v Power Off, count = %d.\n", av_12v_count);
 		if (av_12v_count > 0)
 			av_12v_count--;
 		if (av_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_av_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor AV 12v Power On.\n");
+		dprintk("Power Control: Sensor AV 12v Power On, count = %d.\n", av_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_av_12v_en, 1);
 		av_12v_count++;
@@ -199,14 +199,14 @@ static ssize_t power_vout_12v_store(struct device *dev, struct device_attribute 
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor VOUT 12v Power Off.\n");
+		dprintk("Power Control: Sensor VOUT 12v Power Off, count = %d.\n", vout_12v_count);
 		if (vout_12v_count > 0)
 			vout_12v_count--;
 		if (vout_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_vout_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor VOUT 12v Power On.\n");
+		dprintk("Power Control: Sensor VOUT 12v Power On, count = %d.\n", vout_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_vout_12v_en, 1);
 		vout_12v_count++;
@@ -233,14 +233,14 @@ static ssize_t power_zigbee_12v_store(struct device *dev, struct device_attribut
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor Zigbee 12v Power Off.\n");
+		dprintk("Power Control: Sensor Zigbee 12v Power Off, count = %d.\n", zigbee_12v_count);
 		if (zigbee_12v_count > 0)
 			zigbee_12v_count--;
 		if (zigbee_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_zigbee_12v_en, 0);
 	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor Zigbee 12v Power On.\n");
+		dprintk("Power Control: Sensor Zigbee 12v Power On, count = %d.\n", zigbee_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_zigbee_12v_en, 1);
 		zigbee_12v_count++;
