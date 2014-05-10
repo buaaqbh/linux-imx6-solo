@@ -36,7 +36,7 @@ static inline int ads1000_read(u8 *config, short *data)
 
 	*config = buf[2];
 	power = (buf[0] << 8) | buf[1];
-	power = (power * 330 * 142) / (42 * 2048);
+	power = (power * 330 * 127) / (27 * 2048);
 	*data = (short)power;
 
 //	printk("Power value = %d, config = 0x%x \n", power, *config);
