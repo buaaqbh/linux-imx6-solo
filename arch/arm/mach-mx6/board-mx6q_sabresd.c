@@ -1920,13 +1920,13 @@ static struct platform_device mx6q_power_control_device = {
 static void __init imx6q_sabresd_power_control_init(void)
 {
 	gpio_request(SABRESD_12V_EN, "sys12v-en");
-	gpio_direction_output(SABRESD_12V_EN, 0);
+	gpio_direction_output(SABRESD_12V_EN, 1);
 
 	gpio_request(SABRESD_12V_CAN_EN, "sys12v-can-en");
-	gpio_direction_output(SABRESD_12V_CAN_EN, 0);
+	gpio_direction_output(SABRESD_12V_CAN_EN, 1);
 
 	gpio_request(SABRESD_12V_RS485_EN, "sys12v-rs485-en");
-	gpio_direction_output(SABRESD_12V_RS485_EN, 0);
+	gpio_direction_output(SABRESD_12V_RS485_EN, 1);
 
 	gpio_request(SABRESD_12V_AV_EN, "sys12v-av-en");
 	gpio_direction_output(SABRESD_12V_AV_EN, 0);
@@ -1935,7 +1935,7 @@ static void __init imx6q_sabresd_power_control_init(void)
 	gpio_direction_output(SABRESD_12V_VOUT_EN, 0);
 
 	gpio_request(SABRESD_12V_ZIGBEE_EN, "sys12v-zigbee-en");
-	gpio_direction_output(SABRESD_12V_ZIGBEE_EN, 0);
+	gpio_direction_output(SABRESD_12V_ZIGBEE_EN, 1);
 
 	gpio_request(SABRESD_ZIGBEE_PWR_EN, "zigbee-pwr-en");
 	gpio_direction_output(SABRESD_ZIGBEE_PWR_EN, 0);

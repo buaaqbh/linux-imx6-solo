@@ -166,10 +166,10 @@ static ssize_t power_av_12v_store(struct device *dev, struct device_attribute *a
 
 	if (value == 0) {
 		dprintk("Power Control: Sensor AV 12v Power Off, count = %d.\n", av_12v_count);
-		if (av_12v_count > 0)
-			av_12v_count--;
-		if (av_12v_count == 0)
-			gpio_set_value(pdata->gpio_power_av_12v_en, 0);
+//		if (av_12v_count > 0)
+//			av_12v_count--;
+//		if (av_12v_count == 0)
+		gpio_set_value(pdata->gpio_power_av_12v_en, 0);
 	}
 	else if (value > 0) {
 		dprintk("Power Control: Sensor AV 12v Power On, count = %d.\n", av_12v_count);
