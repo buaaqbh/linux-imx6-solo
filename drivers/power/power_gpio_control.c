@@ -131,14 +131,21 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: Sensor RS485 12v Power Off, count = %d.\n", rs485_12v_count);
+		dprintk("\nPower Control: Sensor RS485 12v Power Off, count = %d.\n", rs485_12v_count);
 		if (rs485_12v_count > 0)
 			rs485_12v_count--;
 		if (rs485_12v_count == 0)
 			gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
 	}
+	else if (value == 0x5a) {
+		dprintk("\nPower Control: Sensor RS485 12v Power Reset.\n");
+		gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
+		msleep(500);
+		gpio_set_value(pdata->gpio_power_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
+	}
 	else if (value > 0) {
-		dprintk("Power Control: Sensor RS485 12v Power On, count = %d.\n", rs485_12v_count);
+		dprintk("\nPower Control: Sensor RS485 12v Power On, count = %d.\n", rs485_12v_count);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
 		rs485_12v_count++;
@@ -496,12 +503,12 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 		return -1;
 
 	if (value == 0) {
-		dprintk("RS485 Direction: receive bytes.\n");
+//		dprintk("RS485 Direction: receive bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 		mdelay(50);
 	}
 	else if (value > 0) {
-		dprintk("RS485 Direction: send bytes.\n");
+//		dprintk("RS485 Direction: send bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 1);
 		mdelay(50);
 	}
