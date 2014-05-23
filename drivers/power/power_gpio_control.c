@@ -139,10 +139,13 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 	}
 	else if (value == 0x5a) {
 		dprintk("\nPower Control: Sensor RS485 12v Power Reset.\n");
+		gpio_set_value(pdata->gpio_power_rs485_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
 		msleep(500);
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
+		gpio_set_value(pdata->gpio_power_rs485_en, 0);
+		msleep(200);
 	}
 	else if (value > 0) {
 		dprintk("\nPower Control: Sensor RS485 12v Power On, count = %d.\n", rs485_12v_count);
