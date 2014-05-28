@@ -261,6 +261,18 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	MX6DL_PAD_CSI0_DAT5__GPIO_5_23,
 };
 
+static iomux_v3_cfg_t mx6dl_sabresd_uart4_enable_pads[] = {
+	/* UART4 for RS485 */
+	MX6DL_PAD_KEY_COL0__UART4_TXD,
+	MX6DL_PAD_KEY_ROW0__UART4_RXD,
+};
+
+static iomux_v3_cfg_t mx6dl_sabresd_uart4_disable_pads[] = {
+	/* UART4 for RS485 */
+	MX6DL_PAD_KEY_COL0__GPIO_4_6,
+	MX6DL_PAD_KEY_ROW0__GPIO_4_7,
+};
+
 static iomux_v3_cfg_t mx6dl_sabresd_csi0_sensor_pads[] = {
 	/* IPU1 Camera */
 	MX6DL_PAD_CSI0_DAT12__IPU1_CSI0_D_12,

@@ -379,11 +379,16 @@ static ssize_t power_rs485_store(struct device *dev, struct device_attribute *at
 		dprintk("Power Control: RS485 Power Off.\n");
 		if (rs485_chip_count > 0)
 			rs485_chip_count--;
-		if (rs485_chip_count == 0)
+		if (rs485_chip_count == 0) {
+			gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 			gpio_set_value(pdata->gpio_power_rs485_en, 1);
+			pdata->rs485_disable();
+		}
 	}
 	else if (value > 0) {
 		dprintk("Power Control: RS485 Power On.\n");
+		pdata->rs485_enable();
+		msleep(100);
 		gpio_set_value(pdata->gpio_power_rs485_en, 0);
 		rs485_chip_count++;
 	}

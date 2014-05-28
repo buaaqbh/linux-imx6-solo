@@ -238,6 +238,9 @@
 #define SABRESD_12V_VOUT_EN	IMX_GPIO_NR(1, 30)
 #define SABRESD_12V_ZIGBEE_EN	IMX_GPIO_NR(6, 6)
 
+#define SABRESD_UART4_TX	IMX_GPIO_NR(4, 6)
+#define SABRESD_UART4_RX	IMX_GPIO_NR(4, 7)
+
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 #define MX6_ENET_IRQ		IMX_GPIO_NR(1, 4)
 #define IOMUX_OBSRV_MUX1_OFFSET	0x3c
@@ -1895,6 +1898,27 @@ static void imx6q_add_smsc911x(void)
 	mxc_register_device(&mx6q_smsc_lan9220_device, &mx6q_smsc911x_config);
 }
 
+static void uart4_enable_pins(void)
+{
+	/* Configure MUX settings to enable EPDC use */
+	mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_enable_pads, \
+				ARRAY_SIZE(mx6dl_sabresd_uart4_enable_pads));
+}
+
+static void uart4_disable_pins(void)
+{
+	/* Configure MUX settings to enable EPDC use */
+	mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_disable_pads, \
+				ARRAY_SIZE(mx6dl_sabresd_uart4_disable_pads));
+
+	gpio_request(SABRESD_UART4_TX, "uart4-tx");
+	gpio_request(SABRESD_UART4_RX, "uart4-rx");
+	gpio_direction_output(SABRESD_UART4_TX, 0);
+	gpio_direction_output(SABRESD_UART4_RX, 0);
+	gpio_free(SABRESD_UART4_TX);
+	gpio_free(SABRESD_UART4_RX);
+}
+
 struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_12v_en = SABRESD_12V_EN,
 	.gpio_power_can_12v_en = SABRESD_12V_CAN_EN,
@@ -1910,6 +1934,8 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_pcie_en = SABRESD_PCIE_PWR_EN,
 	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
 	.gpio_rs485_rx_en = SABRESD_RS485_RE,
+	.rs485_enable = uart4_enable_pins,
+	.rs485_disable = uart4_disable_pins,
 };
 
 static struct platform_device mx6q_power_control_device = {
