@@ -16,8 +16,9 @@ struct gpio_power_data {
 	int gpio_power_pcie_en;
 	int gpio_power_wifi_en;
 	int gpio_rs485_rx_en;
-	void (*rs485_enable)(void);
-	void (*rs485_disable)(void);
+	int gpio_rs485_2_rx_en;
+	void (*rs485_enable)(int);
+	void (*rs485_disable)(int);
 };
 
 #endif

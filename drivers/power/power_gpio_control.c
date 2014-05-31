@@ -45,6 +45,7 @@ static volatile int zigbee_chip_count = 0;
 static volatile int tvp5150_chip_count = 0;
 static volatile int can_chip_count = 0;
 static volatile int rs485_chip_count = 0;
+static volatile int av_rs485_count = 0;
 static volatile int codec_chip_count = 0;
 static volatile int pcie_chip_count = 0;
 static volatile int wifi_chip_count = 0;
@@ -141,7 +142,17 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 		dprintk("\nPower Control: Sensor RS485 12v Power Reset.\n");
 		gpio_set_value(pdata->gpio_power_rs485_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
-		msleep(500);
+
+		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
+		gpio_set_value(pdata->gpio_power_rs485_en, 1);
+		pdata->rs485_disable(4);
+
+		msleep(800);
+
+		pdata->rs485_enable(4);
+		msleep(100);
+		gpio_set_value(pdata->gpio_power_rs485_en, 0);
+
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_en, 0);
@@ -376,21 +387,59 @@ static ssize_t power_rs485_store(struct device *dev, struct device_attribute *at
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
-		dprintk("Power Control: RS485 Power Off.\n");
+		printk("Power Control: Sensor RS485 Power Off.\n");
 		if (rs485_chip_count > 0)
 			rs485_chip_count--;
 		if (rs485_chip_count == 0) {
 			gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 			gpio_set_value(pdata->gpio_power_rs485_en, 1);
-			pdata->rs485_disable();
+			pdata->rs485_disable(4);
 		}
 	}
 	else if (value > 0) {
-		dprintk("Power Control: RS485 Power On.\n");
-		pdata->rs485_enable();
+		printk("Power Control: Sensor RS485 Power On.\n");
+		pdata->rs485_enable(4);
 		msleep(100);
 		gpio_set_value(pdata->gpio_power_rs485_en, 0);
 		rs485_chip_count++;
+	}
+	else {
+		printk("Power Control: Invalid Parameter.\n");
+	}
+
+	mutex_unlock(&power_mutex);
+
+	return size;
+}
+
+static ssize_t power_av_rs485_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+//	if ((pdata == NULL) || (pdata->gpio_power_rs485_en == -1))
+//		return -1;
+
+	mutex_lock(&power_mutex);
+
+	if (value == 0) {
+		printk("Power Control: AV RS485 Power Off.\n");
+		if (av_rs485_count > 0)
+			av_rs485_count--;
+		if (av_rs485_count == 0) {
+			gpio_set_value(pdata->gpio_rs485_2_rx_en, 0);
+			gpio_set_value(pdata->gpio_power_zigbee_en, 1);
+			pdata->rs485_disable(2);
+		}
+	}
+	else if (value > 0) {
+		printk("Power Control: AV RS485 Power On.\n");
+		pdata->rs485_enable(2);
+		msleep(100);
+		gpio_set_value(pdata->gpio_power_zigbee_en, 0);
+		av_rs485_count++;
 	}
 	else {
 		printk("Power Control: Invalid Parameter.\n");
@@ -515,9 +564,19 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 		mdelay(50);
 	}
-	else if (value > 0) {
+	else if (value == 1) {
 //		dprintk("RS485 Direction: send bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 1);
+		mdelay(50);
+	}
+	else if (value == 10) {
+//		dprintk("RS485 Direction: send bytes.\n");
+		gpio_set_value(pdata->gpio_rs485_2_rx_en, 0);
+		mdelay(50);
+	}
+	else if (value == 11) {
+//		dprintk("RS485 Direction: send bytes.\n");
+		gpio_set_value(pdata->gpio_rs485_2_rx_en, 1);
 		mdelay(50);
 	}
 	else {
@@ -537,6 +596,7 @@ static DEVICE_ATTR(power_zigbee, 0666, NULL, power_zigbee_store);
 static DEVICE_ATTR(power_tvp5150, 0666, NULL, power_tvp5150_store);
 static DEVICE_ATTR(power_can, 0666, NULL, power_can_store);
 static DEVICE_ATTR(power_rs485, 0666, NULL, power_rs485_store);
+static DEVICE_ATTR(power_av_rs485, 0666, NULL, power_av_rs485_store);
 static DEVICE_ATTR(power_codec, 0666, NULL, power_codec_store);
 static DEVICE_ATTR(power_pcie, 0666, NULL, power_pcie_store);
 static DEVICE_ATTR(power_wifi, 0666, NULL, power_wifi_store);
@@ -604,6 +664,10 @@ static int __devinit power_gpio_probe(struct platform_device *pdev)
 	err = device_create_file(&pdev->dev, &dev_attr_power_rs485);
         if (err != 0) {
                 printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_av_rs485);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_av_rs485.\n");
         }
 	err = device_create_file(&pdev->dev, &dev_attr_power_codec);
         if (err != 0) {

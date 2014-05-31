@@ -212,6 +212,7 @@
 #define SABRESD_TVP5150_INTR	IMX_GPIO_NR(2, 4)
 
 #define SABRESD_RS485_RE	IMX_GPIO_NR(1, 27)
+#define SABRESD_RS485_2_RE	IMX_GPIO_NR(3, 28)
 
 #define SABRESD_SD0_CLK		IMX_GPIO_NR(1, 20)
 #define SABRESD_SD0_D0		IMX_GPIO_NR(1, 16)
@@ -238,6 +239,8 @@
 #define SABRESD_12V_VOUT_EN	IMX_GPIO_NR(1, 30)
 #define SABRESD_12V_ZIGBEE_EN	IMX_GPIO_NR(6, 6)
 
+#define SABRESD_UART2_TX	IMX_GPIO_NR(3, 26)
+#define SABRESD_UART2_RX	IMX_GPIO_NR(3, 27)
 #define SABRESD_UART4_TX	IMX_GPIO_NR(4, 6)
 #define SABRESD_UART4_RX	IMX_GPIO_NR(4, 7)
 
@@ -298,6 +301,8 @@ static inline void mx6q_sabresd_init_uart(void)
 {
 	gpio_request(SABRESD_RS485_RE, "rs485-re");
 	gpio_direction_output(SABRESD_RS485_RE, 1);
+	gpio_request(SABRESD_RS485_2_RE, "rs485-2-re");
+	gpio_direction_output(SABRESD_RS485_2_RE, 1);
 
 	imx6q_add_imx_uart(0, NULL);
 	imx6q_add_imx_uart(1, NULL);
@@ -1898,25 +1903,43 @@ static void imx6q_add_smsc911x(void)
 	mxc_register_device(&mx6q_smsc_lan9220_device, &mx6q_smsc911x_config);
 }
 
-static void uart4_enable_pins(void)
+static void uart_enable_pins(int id)
 {
 	/* Configure MUX settings to enable EPDC use */
-	mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_enable_pads, \
+	if (id == 2) 
+		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart2_enable_pads, \
+				ARRAY_SIZE(mx6dl_sabresd_uart2_enable_pads));
+	else
+		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_enable_pads, \
 				ARRAY_SIZE(mx6dl_sabresd_uart4_enable_pads));
 }
 
-static void uart4_disable_pins(void)
+static void uart_disable_pins(int id)
 {
 	/* Configure MUX settings to enable EPDC use */
-	mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_disable_pads, \
+	
+	if (id == 2) {
+		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart2_disable_pads, \
+				ARRAY_SIZE(mx6dl_sabresd_uart2_disable_pads));
+
+		gpio_request(SABRESD_UART2_TX, "uart2-tx");
+		gpio_request(SABRESD_UART2_RX, "uart2-rx");
+		gpio_direction_output(SABRESD_UART2_TX, 0);
+		gpio_direction_output(SABRESD_UART2_RX, 0);
+		gpio_free(SABRESD_UART2_TX);
+		gpio_free(SABRESD_UART2_RX);
+	}
+	else {
+		mxc_iomux_v3_setup_multiple_pads(mx6dl_sabresd_uart4_disable_pads, \
 				ARRAY_SIZE(mx6dl_sabresd_uart4_disable_pads));
 
-	gpio_request(SABRESD_UART4_TX, "uart4-tx");
-	gpio_request(SABRESD_UART4_RX, "uart4-rx");
-	gpio_direction_output(SABRESD_UART4_TX, 0);
-	gpio_direction_output(SABRESD_UART4_RX, 0);
-	gpio_free(SABRESD_UART4_TX);
-	gpio_free(SABRESD_UART4_RX);
+		gpio_request(SABRESD_UART4_TX, "uart4-tx");
+		gpio_request(SABRESD_UART4_RX, "uart4-rx");
+		gpio_direction_output(SABRESD_UART4_TX, 0);
+		gpio_direction_output(SABRESD_UART4_RX, 0);
+		gpio_free(SABRESD_UART4_TX);
+		gpio_free(SABRESD_UART4_RX);
+	}
 }
 
 struct gpio_power_data sabresd_gpio_power_data = {
@@ -1934,8 +1957,9 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_pcie_en = SABRESD_PCIE_PWR_EN,
 	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
 	.gpio_rs485_rx_en = SABRESD_RS485_RE,
-	.rs485_enable = uart4_enable_pins,
-	.rs485_disable = uart4_disable_pins,
+	.gpio_rs485_2_rx_en = SABRESD_RS485_2_RE,
+	.rs485_enable = uart_enable_pins,
+	.rs485_disable = uart_disable_pins,
 };
 
 static struct platform_device mx6q_power_control_device = {

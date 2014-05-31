@@ -110,8 +110,9 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	/* UART2 for zigbee */
 	MX6DL_PAD_EIM_D26__UART2_TXD,
 	MX6DL_PAD_EIM_D27__UART2_RXD,
-	MX6DL_PAD_EIM_D28__UART2_CTS,
-	MX6DL_PAD_EIM_D29__UART2_RTS,
+//	MX6DL_PAD_EIM_D28__UART2_CTS,
+	MX6DL_PAD_EIM_D28__GPIO_3_28,
+//	MX6DL_PAD_EIM_D29__UART2_RTS,
 
 	/* UART5 for RS485 */
 	MX6DL_PAD_KEY_COL0__UART4_TXD,
@@ -259,6 +260,18 @@ static iomux_v3_cfg_t mx6dl_sabresd_pads[] = {
 	
 	/* System LED Control */
 	MX6DL_PAD_CSI0_DAT5__GPIO_5_23,
+};
+
+static iomux_v3_cfg_t mx6dl_sabresd_uart2_enable_pads[] = {
+	/* UART2 for RS485 */
+	MX6DL_PAD_EIM_D26__UART2_TXD,
+	MX6DL_PAD_EIM_D27__UART2_RXD,
+};
+
+static iomux_v3_cfg_t mx6dl_sabresd_uart2_disable_pads[] = {
+	/* UART2 for RS485 */
+	MX6DL_PAD_EIM_D26__GPIO_3_26,
+	MX6DL_PAD_EIM_D27__GPIO_3_27,
 };
 
 static iomux_v3_cfg_t mx6dl_sabresd_uart4_enable_pads[] = {
