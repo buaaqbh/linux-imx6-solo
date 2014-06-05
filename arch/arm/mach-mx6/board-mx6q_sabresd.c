@@ -125,7 +125,6 @@
 #define SABRESD_POWER_OFF	IMX_GPIO_NR(3, 29)
 
 #define SABRESD_CAN1_STBY	IMX_GPIO_NR(1, 5)
-#define SABRESD_ECSPI1_CS0  	IMX_GPIO_NR(4, 9)
 #define SABRESD_CODEC_PWR_EN	IMX_GPIO_NR(3, 16)
 #define SABRESD_HDMI_CEC_IN	IMX_GPIO_NR(4, 11)
 
@@ -356,15 +355,6 @@ static struct fec_platform_data fec_data __initdata = {
 #endif
 };
 
-static int mx6q_sabresd_spi_cs[] = {
-	SABRESD_ECSPI1_CS0,
-};
-
-static const struct spi_imx_master mx6q_sabresd_spi_data __initconst = {
-	.chipselect     = mx6q_sabresd_spi_cs,
-	.num_chipselect = ARRAY_SIZE(mx6q_sabresd_spi_cs),
-};
-
 #if defined(CONFIG_MTD_M25P80) || defined(CONFIG_MTD_M25P80_MODULE)
 static struct mtd_partition imx6_sabresd_spi_nor_partitions[] = {
 	{
@@ -398,12 +388,6 @@ static struct spi_board_info imx6_sabresd_spi_nor_device[] __initdata = {
 	},
 #endif
 };
-
-static void spi_device_init(void)
-{
-	spi_register_board_info(imx6_sabresd_spi_nor_device,
-				ARRAY_SIZE(imx6_sabresd_spi_nor_device));
-}
 
 static struct imx_ssi_platform_data mx6_sabresd_ssi_pdata = {
 	.flags = IMX_SSI_DMA | IMX_SSI_SYN,
@@ -2111,9 +2095,6 @@ static void __init mx6_sabresd_board_init(void)
 		gpio_direction_input(SABRESD_PFUZE_INT);
 		mx6q_sabresd_init_pfuze100(SABRESD_PFUZE_INT);
 	}
-	/* SPI */
-//	imx6q_add_ecspi(0, &mx6q_sabresd_spi_data);
-//	spi_device_init();
 
 //	imx6q_add_mxc_hdmi(&hdmi_data);
 
