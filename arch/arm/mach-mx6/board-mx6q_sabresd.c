@@ -525,6 +525,48 @@ static struct platform_device sabresd_vwm8962_reg_devices = {
 	},
 };
 
+/* codec TLV320AIC23 data */
+static struct mxc_audio_platform_data mx6_sabresd_audio_data;
+
+static int mxc_tlv320_init(void)
+{    
+	struct clk *clko2;
+	struct clk *new_parent;
+	int rate;
+
+	clko2 = clk_get(NULL, "clko2_clk");
+	if (IS_ERR(clko2)) {
+		pr_err("can't get CLKO2 clock.\n");
+		return PTR_ERR(clko2);
+	}
+
+	new_parent = clk_get(NULL, "osc_clk");
+	if (!IS_ERR(new_parent)) {
+		clk_set_parent(clko2, new_parent);
+		clk_put(new_parent);
+	}
+
+	/* MCLK = 12 MHz */
+	rate = clk_round_rate(clko2, 12000000);
+	mx6_sabresd_audio_data.sysclk = rate;
+	clk_set_rate(clko2, rate);
+	clk_enable(clko2);
+
+	return 0;
+}
+
+static struct mxc_audio_platform_data mx6_sabresd_audio_data = {
+	.ssi_num = 1,
+	.src_port = 2,
+	.ext_port = 5,
+	.init = mxc_tlv320_init,
+	.hp_gpio = -1,
+};
+
+static struct platform_device mx6_sabresd_audio_device = {
+	.name = "imx-tlv320",
+};
+
 static void mx6q_csi0_cam_powerdown(int powerdown)
 {
 //	if (powerdown)
@@ -872,8 +914,13 @@ static struct fsl_mxc_lightsensor_platform_data ls_data = {
 };
 
 static struct i2c_board_info mxc_i2c0_board_info[] __initdata = {
+/*	
 	{
 		I2C_BOARD_INFO("wm89**", 0x1a),
+	},
+*/
+	{
+		I2C_BOARD_INFO("tlv320aic23", 0x1a),
 	},
 	{
 		I2C_BOARD_INFO("ov564x", 0x3c),
@@ -1559,6 +1606,11 @@ static struct platform_device sabresd_vmmc_reg_devices = {
 
 static int __init imx6q_init_audio(void)
 {
+#ifdef CONFIG_SND_SOC_IMX_TLV320
+	mxc_register_device(&mx6_sabresd_audio_device, &mx6_sabresd_audio_data);
+	imx6q_add_imx_ssi(1, &mx6_sabresd_ssi_pdata);
+	mxc_tlv320_init();	
+#else
 	if (board_is_mx6_reva()) {
 		mxc_register_device(&mx6_sabresd_audio_wm8958_device,
 				    &wm8958_data);
@@ -1573,6 +1625,7 @@ static int __init imx6q_init_audio(void)
 
 		mxc_wm8962_init();
 	}
+#endif
 
 	return 0;
 }
@@ -2075,7 +2128,7 @@ static void __init mx6_sabresd_board_init(void)
 //	imx6q_add_mxc_hdmi(&hdmi_data);
 
 //	imx6q_add_anatop_thermal_imx(1, &mx6q_sabresd_anatop_thermal_data);
-//	imx6_init_fec(fec_data);
+	imx6_init_fec(fec_data);
 #ifdef CONFIG_MX6_ENET_IRQ_TO_GPIO
 	/* Make sure the IOMUX_OBSRV_MUX1 is set to ENET_IRQ. */
 	mxc_iomux_set_specialbits_register(IOMUX_OBSRV_MUX1_OFFSET,
@@ -2146,11 +2199,11 @@ static void __init mx6_sabresd_board_init(void)
 #endif
 	}
 	imx6q_add_vpu();
-//	imx6q_init_audio();
-//	platform_device_register(&sabresd_vmmc_reg_devices);
-//	imx_asrc_data.asrc_core_clk = clk_get(NULL, "asrc_clk");
-//	imx_asrc_data.asrc_audio_clk = clk_get(NULL, "asrc_serial_clk");
-//	imx6q_add_asrc(&imx_asrc_data);
+	imx6q_init_audio();
+	platform_device_register(&sabresd_vmmc_reg_devices);
+	imx_asrc_data.asrc_core_clk = clk_get(NULL, "asrc_clk");
+	imx_asrc_data.asrc_audio_clk = clk_get(NULL, "asrc_serial_clk");
+	imx6q_add_asrc(&imx_asrc_data);
 
 	/*
 	 * Disable HannStar touch panel CABC function,
