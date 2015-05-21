@@ -509,6 +509,37 @@ static ssize_t power_wifi_store(struct device *dev, struct device_attribute *att
 	return size;
 }
 
+static ssize_t power_nrsec_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
+{
+	size_t status;
+	long value;
+
+	status = strict_strtol(buf, 0, &value);
+
+	if ((pdata == NULL) || (pdata->gpio_power_nrsec_3v3 == -1))
+		return -1;
+
+	mutex_lock(&power_mutex);
+
+	if (value == 0) {
+		dprintk("Power Control: NRSEC3000 Power Off.\n");
+		gpio_set_value(pdata->gpio_power_nrsec_3v3, 1);
+		gpio_set_value(pdata->gpio_power_nrsec_1v8, 1);
+	}
+	else if (value > 0) {
+		dprintk("Power Control: NRSEC3000 Power On.\n");
+		gpio_set_value(pdata->gpio_power_nrsec_3v3, 0);
+		gpio_set_value(pdata->gpio_power_nrsec_1v8, 0);
+	}
+	else {
+		printk("Power Control: NRSEC3000 Invalid Parameter.\n");
+	}
+
+	mutex_unlock(&power_mutex);
+
+	return size;
+}
+
 static ssize_t rs485_direction_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
 {
 	size_t status;
@@ -549,6 +580,7 @@ static DEVICE_ATTR(power_rs485, 0666, NULL, power_rs485_store);
 static DEVICE_ATTR(power_codec, 0666, NULL, power_codec_store);
 static DEVICE_ATTR(power_pcie, 0666, NULL, power_pcie_store);
 static DEVICE_ATTR(power_wifi, 0666, NULL, power_wifi_store);
+static DEVICE_ATTR(power_nrsec, 0666, NULL, power_nrsec_store);
 static DEVICE_ATTR(rs485_direction, 0666, NULL, rs485_direction_store);
 
 static int __devinit power_gpio_probe(struct platform_device *pdev)
@@ -625,6 +657,10 @@ static int __devinit power_gpio_probe(struct platform_device *pdev)
 	err = device_create_file(&pdev->dev, &dev_attr_power_wifi);
         if (err != 0) {
                 printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_wifi.\n");
+        }
+	err = device_create_file(&pdev->dev, &dev_attr_power_nrsec);
+        if (err != 0) {
+                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_nrsec.\n");
         }
 	err = device_create_file(&pdev->dev, &dev_attr_rs485_direction);
         if (err != 0) {

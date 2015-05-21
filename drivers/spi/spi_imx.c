@@ -602,6 +602,8 @@ static void spi_imx_chipselect(struct spi_device *spi, int is_active)
 	if (gpio < 0)
 		return;
 
+//	printk("SPI: gpio = %d, lowactive = %d, active = %d\n", gpio, dev_is_lowactive, active);
+
 	gpio_set_value(gpio, dev_is_lowactive ^ active);
 }
 

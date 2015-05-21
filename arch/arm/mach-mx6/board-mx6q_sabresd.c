@@ -125,6 +125,7 @@
 #define SABRESD_POWER_OFF	IMX_GPIO_NR(3, 29)
 
 #define SABRESD_CAN1_STBY	IMX_GPIO_NR(1, 5)
+#define SABRESD_ECSPI1_CS0	IMX_GPIO_NR(2, 26)
 #define SABRESD_CODEC_PWR_EN	IMX_GPIO_NR(3, 16)
 #define SABRESD_HDMI_CEC_IN	IMX_GPIO_NR(4, 11)
 
@@ -202,6 +203,9 @@
 #define SABRESD_WIFI_PWR_EN	IMX_GPIO_NR(2, 20)
 #define SABRESD_WIFI_INT	IMX_GPIO_NR(2, 3)
 #define SABRESD_WIFI_WAKEUP	IMX_GPIO_NR(3, 19)
+
+#define SABRESD_NRSEC_3V3_EN	IMX_GPIO_NR(2, 7)
+#define SABRESD_NRSEC_1V8_EN	IMX_GPIO_NR(2, 30)
 
 #define SABRESD_TVP5150_PWR_EN	IMX_GPIO_NR(1, 2)
 #define SABRESD_TVP5150_RST	IMX_GPIO_NR(7, 7)
@@ -350,6 +354,15 @@ static struct fec_platform_data fec_data __initdata = {
 #endif
 };
 
+static int mx6q_sabresd_spi_cs[] = {
+        SABRESD_ECSPI1_CS0,
+};
+
+static const struct spi_imx_master mx6q_sabresd_spi_data __initconst = {
+        .chipselect     = mx6q_sabresd_spi_cs,
+        .num_chipselect = ARRAY_SIZE(mx6q_sabresd_spi_cs),
+};
+
 #if defined(CONFIG_MTD_M25P80) || defined(CONFIG_MTD_M25P80_MODULE)
 static struct mtd_partition imx6_sabresd_spi_nor_partitions[] = {
 	{
@@ -382,7 +395,19 @@ static struct spi_board_info imx6_sabresd_spi_nor_device[] __initdata = {
 		.platform_data = &imx6_sabresd__spi_flash_data,
 	},
 #endif
+	{
+		.modalias = "spidev",
+		.max_speed_hz = 33000000, /* max spi clock (SCK) speed in HZ */
+		.bus_num = 1,
+		.chip_select = 0,
+	},
 };
+
+static void spi_device_init(void)
+{
+        spi_register_board_info(imx6_sabresd_spi_nor_device,
+                                ARRAY_SIZE(imx6_sabresd_spi_nor_device));
+}
 
 static struct imx_ssi_platform_data mx6_sabresd_ssi_pdata = {
 	.flags = IMX_SSI_DMA | IMX_SSI_SYN,
@@ -1918,7 +1943,8 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_pcie_en = SABRESD_PCIE_PWR_EN,
 	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
 	.gpio_rs485_rx_en = SABRESD_RS485_RE,
-	.rs485_enable = uart4_enable_pins,
+	.gpio_power_nrsec_3v3 = SABRESD_NRSEC_3V3_EN,
+	.gpio_power_nrsec_1v8 = SABRESD_NRSEC_1V8_EN,
 	.rs485_disable = uart4_disable_pins,
 };
 
@@ -1972,6 +1998,11 @@ static void __init imx6q_sabresd_power_control_init(void)
 
 	gpio_request(SABRESD_WIFI_PWR_EN, "wifi-pwr-en");
 	gpio_direction_output(SABRESD_WIFI_PWR_EN, 0);
+
+	gpio_request(SABRESD_NRSEC_3V3_EN, "nrsec-3v3-en");
+	gpio_direction_output(SABRESD_NRSEC_3V3_EN, 0);
+	gpio_request(SABRESD_NRSEC_1V8_EN, "nrsec-1v8-en");
+	gpio_direction_output(SABRESD_NRSEC_1V8_EN, 0);
 
 	mxc_register_device(&mx6q_power_control_device, &sabresd_gpio_power_data);
 }
@@ -2071,6 +2102,10 @@ static void __init mx6_sabresd_board_init(void)
 		gpio_direction_input(SABRESD_PFUZE_INT);
 		mx6q_sabresd_init_pfuze100(SABRESD_PFUZE_INT);
 	}
+
+        /* SPI */
+        imx6q_add_ecspi(1, &mx6q_sabresd_spi_data);
+        spi_device_init();
 
 //	imx6q_add_mxc_hdmi(&hdmi_data);
 
