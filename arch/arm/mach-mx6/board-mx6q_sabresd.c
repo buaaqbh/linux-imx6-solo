@@ -215,6 +215,7 @@
 #define SABRESD_TVP5150_INTR	IMX_GPIO_NR(2, 4)
 
 #define SABRESD_RS485_RE	IMX_GPIO_NR(1, 27)
+#define SABRESD_RS485_2_RE	IMX_GPIO_NR(4, 15)
 
 #define SABRESD_SD0_CLK		IMX_GPIO_NR(1, 20)
 #define SABRESD_SD0_D0		IMX_GPIO_NR(1, 16)
@@ -301,10 +302,13 @@ static inline void mx6q_sabresd_init_uart(void)
 {
 	gpio_request(SABRESD_RS485_RE, "rs485-re");
 	gpio_direction_output(SABRESD_RS485_RE, 1);
+	gpio_request(SABRESD_RS485_2_RE, "rs485_2-re");
+	gpio_direction_output(SABRESD_RS485_2_RE, 1);
 
 	imx6q_add_imx_uart(0, NULL);
 	imx6q_add_imx_uart(1, NULL);
 	imx6q_add_imx_uart(3, NULL);
+	imx6q_add_imx_uart(4, NULL);
 }
 
 static int mx6q_sabresd_fec_phy_init(struct phy_device *phydev)
@@ -1943,6 +1947,7 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_power_pcie_en = SABRESD_PCIE_PWR_EN,
 	.gpio_power_wifi_en = SABRESD_WIFI_PWR_EN,
 	.gpio_rs485_rx_en = SABRESD_RS485_RE,
+	.gpio_rs485_2_rx_en = SABRESD_RS485_2_RE,
 	.gpio_power_nrsec_3v3 = SABRESD_NRSEC_3V3_EN,
 	.gpio_power_nrsec_1v8 = SABRESD_NRSEC_1V8_EN,
 	.rs485_disable = uart4_disable_pins,

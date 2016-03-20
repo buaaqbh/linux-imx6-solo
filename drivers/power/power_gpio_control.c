@@ -60,7 +60,7 @@ static ssize_t power_12v_store(struct device *dev, struct device_attribute *attr
 
 	if ((pdata == NULL) || (pdata->gpio_power_12v_en == -1))
 		return -1;
-	
+
 	mutex_lock(&power_mutex);
 
 	if (value == 0) {
@@ -143,13 +143,13 @@ static ssize_t power_rs485_12v_store(struct device *dev, struct device_attribute
 		gpio_set_value(pdata->gpio_power_rs485_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 0);
 
-                gpio_set_value(pdata->gpio_rs485_rx_en, 0);
-//		pdata->rs485_disable();
+		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
+		//		pdata->rs485_disable();
 
-                msleep(2000);
+		msleep(2000);
 
-                pdata->rs485_enable();
-                msleep(100);
+		pdata->rs485_enable();
+		msleep(100);
 
 		gpio_set_value(pdata->gpio_power_12v_en, 1);
 		gpio_set_value(pdata->gpio_power_rs485_12v_en, 1);
@@ -185,9 +185,9 @@ static ssize_t power_av_12v_store(struct device *dev, struct device_attribute *a
 
 	if (value == 0) {
 		dprintk("Power Control: Sensor AV 12v Power Off, count = %d.\n", av_12v_count);
-//		if (av_12v_count > 0)
-//			av_12v_count--;
-//		if (av_12v_count == 0)
+		//		if (av_12v_count > 0)
+		//			av_12v_count--;
+		//		if (av_12v_count == 0)
 		gpio_set_value(pdata->gpio_power_av_12v_en, 0);
 	}
 	else if (value > 0) {
@@ -391,7 +391,7 @@ static ssize_t power_rs485_store(struct device *dev, struct device_attribute *at
 			printk("Power Control: RS485 Power Off.\n");
 			gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 			gpio_set_value(pdata->gpio_power_rs485_en, 1);
-//			pdata->rs485_disable();
+			//			pdata->rs485_disable();
 		}
 	}
 	else if (value > 0) {
@@ -550,17 +550,28 @@ static ssize_t rs485_direction_store(struct device *dev, struct device_attribute
 	if ((pdata == NULL) || (pdata->gpio_rs485_rx_en == -1))
 		return -1;
 
-	if (value == 0) {
-//		dprintk("RS485 Direction: receive bytes.\n");
+	switch (value) {
+	case 0x00:
+		//dprintk("RS485 Direction: receive bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 0);
 		mdelay(50);
-	}
-	else if (value > 0) {
-//		dprintk("RS485 Direction: send bytes.\n");
+		break;
+	case 0x01:
+		//dprintk("RS485 Direction: send bytes.\n");
 		gpio_set_value(pdata->gpio_rs485_rx_en, 1);
 		mdelay(50);
-	}
-	else {
+		break;
+	case 0x80:
+		//dprintk("RS485 Direction: receive bytes.\n");
+		gpio_set_value(pdata->gpio_rs485_2_rx_en, 0);
+		mdelay(50);
+		break;
+	case 0x81:
+		//dprintk("RS485 Direction: send bytes.\n");
+		gpio_set_value(pdata->gpio_rs485_2_rx_en, 1);
+		mdelay(50);
+		break;
+	default:
 		printk("RS485 Direction: Invalid Parameter.\n");
 	}
 
@@ -607,94 +618,94 @@ static int __devinit power_gpio_probe(struct platform_device *pdev)
 	printk(KERN_INFO "RS485 Control: gpio_rs485_rx_en = %d\n", pdata->gpio_rs485_rx_en);
 
 	err = device_create_file(&pdev->dev, &dev_attr_power_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_can_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_can_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_can_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_rs485_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_av_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_av_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_av_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_vout_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_vout_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_vout_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_zigbee_12v);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_zigbee_12v.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_zigbee_12v.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_zigbee);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_zigbee.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_zigbee.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_tvp5150);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_tvp5150.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_tvp5150.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_can);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_can.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_can.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_rs485);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_rs485.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_codec);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_codec.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_codec.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_pcie);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_pcie.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_pcie.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_wifi);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_wifi.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_wifi.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_power_nrsec);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_nrsec.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_power_nrsec.\n");
+	}
 	err = device_create_file(&pdev->dev, &dev_attr_rs485_direction);
-        if (err != 0) {
-                printk(KERN_ERR "Power Control: cannot create FILE dev_attr_rs485_direction.\n");
-        }
+	if (err != 0) {
+		printk(KERN_ERR "Power Control: cannot create FILE dev_attr_rs485_direction.\n");
+	}
 
 	return 0;
 }
 
 static int __devexit power_gpio_drv_remove(struct platform_device *pdev)
 {
-        dev_dbg(&pdev->dev, "released and freed device\n");
-        return 0;
+	dev_dbg(&pdev->dev, "released and freed device\n");
+	return 0;
 }
 
 static struct platform_driver power_gpio_driver = {
-        .driver = {
-                .name    = "gpio-power",
-                .owner   = THIS_MODULE,
-        },
-        .probe   = power_gpio_probe,
-        .remove  = __devexit_p(power_gpio_drv_remove),
+	.driver = {
+		.name    = "gpio-power",
+		.owner   = THIS_MODULE,
+	},
+	.probe   = power_gpio_probe,
+	.remove  = __devexit_p(power_gpio_drv_remove),
 };
 
 static int __init power_gpio_init(void)
 {
-        printk(KERN_INFO "i.MX Power GPIO Control Driver Registered.\n");
+	printk(KERN_INFO "i.MX Power GPIO Control Driver Registered.\n");
 
-        return platform_driver_register(&power_gpio_driver);
+	return platform_driver_register(&power_gpio_driver);
 }
 
 static void __exit power_gpio_cleanup(void)
 {
-        platform_driver_unregister(&power_gpio_driver);
+	platform_driver_unregister(&power_gpio_driver);
 }
 
 module_init(power_gpio_init);
