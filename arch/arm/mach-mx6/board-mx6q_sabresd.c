@@ -1950,6 +1950,7 @@ struct gpio_power_data sabresd_gpio_power_data = {
 	.gpio_rs485_2_rx_en = SABRESD_RS485_2_RE,
 	.gpio_power_nrsec_3v3 = SABRESD_NRSEC_3V3_EN,
 	.gpio_power_nrsec_1v8 = SABRESD_NRSEC_1V8_EN,
+    .rs485_enable = uart4_enable_pins,
 	.rs485_disable = uart4_disable_pins,
 };
 
